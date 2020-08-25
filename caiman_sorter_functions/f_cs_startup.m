@@ -31,8 +31,10 @@ if exist(ops_path, 'file')
         f_cs_update_log(app, 'RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
     end
     f_cs_write_ops(app, app.ops);
+else
+    save(ops_path, 'ops');
+    disp('RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
+    f_cs_update_log(app, 'RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
 end
-
-
 
 end
