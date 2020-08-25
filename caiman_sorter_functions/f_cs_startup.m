@@ -8,7 +8,7 @@ app.TabGroup2.Visible = 0;
 app.CellselectionPanel.Visible = 0;
 
 ops = f_cs_collect_ops(app);
-ops_path = [pwd2 '\caiman_sorter_options.mat'];
+ops_path = app.gui_path;
 ops.ops_path = ops_path;
 
 if exist(ops_path, 'file')
