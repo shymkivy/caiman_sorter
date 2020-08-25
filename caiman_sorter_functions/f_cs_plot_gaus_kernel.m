@@ -2,7 +2,7 @@ function f_cs_plot_gaus_kernel(sigma, frame_rate)
 
 dt = 1000/double(frame_rate);
 
-sigma_frames = sigma/frame_rate;
+sigma_frames = sigma/dt;
 % make kernel
 kernel_half_size = ceil(sqrt(-log(0.05)*2*sigma_frames^2));
 gaus_win = -kernel_half_size:kernel_half_size;
