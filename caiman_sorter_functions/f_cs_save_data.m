@@ -3,7 +3,7 @@ function f_cs_save_data(app)
 fw = app.UIFigure;
 hw = uiprogressdlg(fw,'Title','Saving data...');
 
-app.ops = f_cs_collect_ops(app, app.ops);
+app.ops = f_cs_collect_ops(app);
 app.proc.deconv.smooth_dfdt.params =    app.ops.deconv.smooth_dfdt.params;
 app.proc.deconv.c_foopsi.params =       app.ops.deconv.c_foopsi.params;
 app.proc.deconv.MCMC.params =           app.ops.deconv.MCMC.params;

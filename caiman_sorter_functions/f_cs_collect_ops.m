@@ -1,5 +1,5 @@
-function ops = f_cs_collect_ops(app, ops)
-
+function ops = f_cs_collect_ops(app)
+ops = app.ops;
 % evaluate components params
 ops.SwitchCaimanEvaluate = app.SwitchCaimanEvaluate.Value;
 %caiman method
