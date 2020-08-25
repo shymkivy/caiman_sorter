@@ -1,4 +1,5 @@
 function ops = f_cs_browse_button(app)
+
 ops = app.ops;
 browse_exist = 0;
 if isfield(ops, 'browse_path')
@@ -17,9 +18,10 @@ end
 if path
     ops.browse_path = path;
 end
+
 drawnow; pause(0.05);
-app.UIFigure.Visible = 'off';
-app.UIFigure.Visible = 'on';
+%app.UIFigure.Visible = 'off';
+%app.UIFigure.Visible = 'on';
 if isequal(file_name,0)
    disp('User selected Cancel');
 else
@@ -28,4 +30,5 @@ else
    app.LoadDataEditField.Value = app.file_loc;
 end
 
+app.ops = ops;
 end

@@ -49,17 +49,20 @@ if isobject(app.PlotconstfoopsiSwitch)
 end
 
 if isobject(app.ARmodelSwitchMCMC)
-    if ~isempty(app.proc.deconv.MCMC.SAMP)
-        if ~isempty(app.proc.deconv.MCMC.SAMP{app.current_cell_num})
+    if ~isempty(app.proc.deconv.MCMC.S)
+        if ~isempty(app.proc.deconv.MCMC.S{app.current_cell_num})
             app.PlotMCMCSwitch.Enable = 1;
-            app.PlotMCMCdetailsButton.Enable = 1;
         else
             app.PlotMCMCSwitch.Enable = 0;
-            app.PlotMCMCdetailsButton.Enable = 0;
+        end
+        if ~isempty(app.proc.deconv.MCMC.SAMP{app.current_cell_num})
+            app.PlotMCMCSAMPLESdetailsButton.Enable = 1;
+        else
+            app.PlotMCMCSAMPLESdetailsButton.Enable = 0;
         end
     else
         app.PlotMCMCSwitch.Enable = 0;
-        app.PlotMCMCdetailsButton.Enable = 0;
+        app.PlotMCMCSAMPLESdetailsButton.Enable = 0;
     end
 end
 

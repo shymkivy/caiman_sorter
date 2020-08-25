@@ -1,12 +1,18 @@
-function f_cs_plot_gaus_kernel(sigma_frames, win_frames, dt)
+function f_cs_plot_gaus_kernel(sigma, frame_rate)
 
-gaus_win = (1:win_frames) - (win_frames+1)/2;
+dt = 1000/double(frame_rate);
+
+sigma_frames = sigma/frame_rate;
+% make kernel
+kernel_half_size = ceil(sqrt(-log(0.05)*2*sigma_frames^2));
+gaus_win = -kernel_half_size:kernel_half_size;
 plot_t = gaus_win*dt;
 gaus_kernel = exp(-((gaus_win).^2)/(2*sigma_frames^2));
 gaus_kernel = gaus_kernel/sum(gaus_kernel);
-figure; 
+
 plot(plot_t, gaus_kernel);
-title(['Gaussian kernel; sigma=' num2str(dt*sigma_frames) 'ms']);
-xlabel('Time (ms)');
+title(sprintf('Gaussian kernel; sigma = %dms',  sigma));
+xlabel('Time (ms)'); axis tight;
+
 
 end

@@ -31,15 +31,23 @@ if ~isempty(app.file_loc)
             app.est.dims = temp_load.dims;
         end
         if isfield(temp_load, 'ops')
+            browse_path = app.ops.browse_path;
             app.ops = temp_load.ops;
+            app.ops.browse_path = browse_path;
         end
         if isfield(temp_load, 'proc')
             app.proc = temp_load.proc;
         end
         f_cs_update_log(app, ['Loaded .mat: ' strrep(app.file_loc, '\', '\\')])
     end
-
-    f_cs_write_ops(app, app.ops);
+    
+    app.VisualizationparamsPanel.Visible = 1;
+    app.CatracePanel.Visible = 1;
+    app.TabGroup.Visible = 1;
+    app.TabGroup2.Visible = 1;
+    app.CellselectionPanel.Visible = 1;
+    
+    f_cs_write_ops(app);
     f_cs_update_log(app, 'Initializing...');
     f_cs_initialize_GUI_params(app);
 

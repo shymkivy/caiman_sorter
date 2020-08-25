@@ -8,6 +8,7 @@ params.Nsamples = app.MCMCNNumberOfSamples.Value;
 params.B = app.MCMCBurnInSamples.Value;
 params.sn = app.proc.noise(n_cell);
 
+dt = 1/double(app.ops.init_params_caiman.data.fr);
 
 if params.p == 1
     if app.UsemanualtimeconstantsCheckBoxMCMC.Value

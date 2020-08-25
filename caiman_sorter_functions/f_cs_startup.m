@@ -1,8 +1,12 @@
-function ops = f_cs_startup(app)
+function f_cs_startup(app)
 
 disp('Caiman Sorter GUI started');
 
-ops = app.ops;
+app.VisualizationparamsPanel.Visible = 0;
+app.CatracePanel.Visible = 0;
+app.TabGroup.Visible = 0;
+app.TabGroup2.Visible = 0;
+app.CellselectionPanel.Visible = 0;
 
 pwd2 = fileparts(which('caiman_sorter.mlapp'));
 %pwd2 = pwd;
@@ -17,24 +21,26 @@ if exist([pwd2 '\caiman_sorter_functions'], 'dir')
 else
     error('RAFA: You need to move to caiman sorter directory and reopen GUI!!!');
 end
-app.ops = f_cs_collect_ops(app);
+ops = f_cs_collect_ops(app);
 ops_path = [pwd2 '\caiman_sorter_options.mat'];
-app.ops.ops_path = ops_path;
+ops.ops_path = ops_path;
 
 if exist(ops_path, 'file')
     ops_temp = load(ops_path, 'ops');
-    app.ops = ops_temp.ops;
-    app.ops.ops_path = ops_path;
-    f_cs_update_log(app, ['ops loaded path: ' app.ops.ops_path]);
+    ops = ops_temp.ops;
+    ops.ops_path = ops_path;
+    f_cs_update_log(app, ['ops loaded path: ' ops.ops_path]);
     if ~strcmpi(ops_temp.ops.ops_path, ops_path)
         disp('RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
         f_cs_update_log(app, 'RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
     end
-    f_cs_write_ops(app, app.ops);
+    f_cs_write_ops(app);
 else
     save(ops_path, 'ops');
     disp('RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
     f_cs_update_log(app, 'RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
 end
+
+app.ops = ops;
 
 end

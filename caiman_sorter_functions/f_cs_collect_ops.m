@@ -27,7 +27,6 @@ eval_params2.EvalMinSigFrac =           app.CheckBoxMinSigFrac.Value;
 % smooth df/dt
 deconv.smooth_dfdt.params.convolve_gaus =       app.ConvolvewithgaussiankernelCheckBoxSmoothdfdt.Value;
 deconv.smooth_dfdt.params.gauss_kernel_simga =  app.GaussKernelSimgaSmoothdfdt.Value;
-deconv.smooth_dfdt.params.gauss_kernel_size =   app.GaussKernelSizeFramesSmoothdfdt.Value;
 deconv.smooth_dfdt.params.rectify =             app.RectifyCheckBox.Value;
 deconv.smooth_dfdt.params.normalize =           app.NormalizeCheckBox.Value;
 deconv.smooth_dfdt.params.apply_thresh =        app.ApplythresholdCheckBox.Value;
@@ -45,7 +44,6 @@ if isobject(app.ARmodelSwitchCfoopsi)
     deconv.c_foopsi.params.manual_tau_decay =   app.TaudecayEditFieldCfoopsi.Value;
     deconv.c_foopsi.params.convolve_gaus =      app.ConvolvewithgaussiankernelCheckBoxCfoopsi.Value;
     deconv.c_foopsi.params.gauss_kernel_simga =	app.GaussKernelSimgaCfoopsi.Value;
-    deconv.c_foopsi.params.gauss_kernel_size =	app.GaussKernelSizeFramesCfoopsi.Value;
     deconv.c_foopsi.gui.scale_value =           app.ScaleEditFieldCfoopsi.Value;
     deconv.c_foopsi.gui.shift_value =           app.ShiftEditFieldCfoopsi.Value;
 end
@@ -60,7 +58,6 @@ if isobject(app.ARmodelSwitchMCMC)
     deconv.MCMC.params.manual_tau_decay =       app.TaudecayEditFieldMCMC.Value;
     deconv.MCMC.params.convolve_gaus =          app.ConvolvewithgaussiankernelCheckBoxMCMC.Value;
     deconv.MCMC.params.gauss_kernel_simga =     app.GaussKernelSimgaMCMC.Value;
-    deconv.MCMC.params.gauss_kernel_size =      app.GaussKernelSizeFramesMCMC.Value;
     deconv.MCMC.gui.scale_value =               app.ScaleEditFieldMCMC.Value;
     deconv.MCMC.gui.shift_value =               app.ShiftEditFieldMCMC.Value;
     deconv.MCMC.params.save_SAMP =              app.SaveSamplesOutputsMCMC.Value;

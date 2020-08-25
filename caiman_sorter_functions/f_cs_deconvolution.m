@@ -29,7 +29,7 @@ elseif strcmp(app.DeonvolutionTypeGroup.SelectedTab.Title, 'MCMC')
     end
     close(hw);
     app.PlotMCMCSwitch.Enable = 1;
-    app.PlotMCMCdetailsButton.Enable = 1;
+    app.PlotMCMCSAMPLESdetailsButton.Enable = 1;
 end
 
 end

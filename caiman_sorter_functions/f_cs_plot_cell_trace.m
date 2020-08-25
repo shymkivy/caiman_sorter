@@ -56,7 +56,7 @@ function f_cs_plot_cell_trace(app)
                 hold(app.UIAxes_ca_trace, 'on');
                 trace1 = app.proc.deconv.c_foopsi.S{app.current_cell_num};
                 if app.ConvolvewithgaussiankernelCheckBoxCfoopsi.Value
-                    trace1 = convolve_gauss(trace1, app.GaussKernelSizeFramesCfoopsi.Value, app.GaussKernelSimgaCfoopsi.Value*fr/1000);
+                    trace1 = convolve_gauss(trace1, app.GaussKernelSimgaCfoopsi.Value, fr);
                 end
                 trace1 = trace1*app.ScaleEditFieldCfoopsi.Value+app.ShiftEditFieldCfoopsi.Value;
                 trace2 = app.proc.deconv.c_foopsi.C{app.current_cell_num};
@@ -73,7 +73,7 @@ function f_cs_plot_cell_trace(app)
                 hold(app.UIAxes_ca_trace, 'on');
                 trace1 = app.proc.deconv.MCMC.S{app.current_cell_num};
                 if app.ConvolvewithgaussiankernelCheckBoxMCMC.Value
-                    trace1 = convolve_gauss(trace1, app.GaussKernelSizeFramesMCMC.Value, app.GaussKernelSimgaMCMC.Value*fr/1000);
+                    trace1 = convolve_gauss(trace1, app.GaussKernelSimgaMCMC.Value, fr);
                 end
                 trace1 = trace1*app.ScaleEditFieldMCMC.Value+app.ShiftEditFieldMCMC.Value;
                 trace2 = app.proc.deconv.MCMC.C{app.current_cell_num};
@@ -85,11 +85,15 @@ function f_cs_plot_cell_trace(app)
     end
 end
 
-function trace = convolve_gauss(y, win_size_frames, sigma_frames)
+function trace = convolve_gauss(y, sigma, frame_rate)
 
-gaus_win = (1:win_size_frames) - (win_size_frames+1)/2;
+sigma_frames = sigma/frame_rate;
+% make kernel
+kernel_half_size = ceil(sqrt(-log(0.05)*2*sigma_frames^2));
+gaus_win = -kernel_half_size:kernel_half_size;
 gaus_kernel = exp(-((gaus_win).^2)/(2*sigma_frames^2));
 gaus_kernel = gaus_kernel/sum(gaus_kernel);
+
 trace = conv2(y, gaus_kernel, 'same');
 
 end
