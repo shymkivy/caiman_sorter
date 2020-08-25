@@ -1,5 +1,4 @@
 function f_cs_startup(app)
-
 disp('Caiman Sorter GUI started');
 
 app.VisualizationparamsPanel.Visible = 0;
@@ -8,19 +7,6 @@ app.TabGroup.Visible = 0;
 app.TabGroup2.Visible = 0;
 app.CellselectionPanel.Visible = 0;
 
-pwd2 = fileparts(which('caiman_sorter.mlapp'));
-%pwd2 = pwd;
-
-if exist([pwd2 '\caiman_sorter_functions'], 'dir')
-    addpath([pwd2 '\caiman_sorter_functions']);
-    addpath([pwd2 '\caiman_sorter_functions\deconvolution_dep']);
-    addpath([pwd2 '\caiman_sorter_functions\deconvolution_dep\MCMC']);
-    addpath([pwd2 '\caiman_sorter_functions\deconvolution_dep\MCMC\utilities']);
-    addpath([pwd2 '\caiman_sorter_functions\deconvolution_dep\oasis']);
-    addpath([pwd2 '\caiman_sorter_functions\deconvolution_dep\functions']);
-else
-    error('RAFA: You need to move to caiman sorter directory and reopen GUI!!!');
-end
 ops = f_cs_collect_ops(app);
 ops_path = [pwd2 '\caiman_sorter_options.mat'];
 ops.ops_path = ops_path;
