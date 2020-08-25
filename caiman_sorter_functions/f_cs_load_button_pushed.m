@@ -67,8 +67,6 @@ if ~isempty(app.file_loc)
     f_cs_update_curr_cell_info(app);
 
     % turn on panels
-    app.ParametersPanel.Visible = true;
-    app.TemporaltracePanel.Visible = true;
     app.SavedataButton.Enable = true;
     
     close(hw);
