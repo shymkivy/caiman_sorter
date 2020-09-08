@@ -24,12 +24,16 @@ elseif params.p == 2
     end
 end
 
-SAMP = cont_ca_sampler(y,params);
-SAMP.C_rec = extract_C_YS(SAMP,y);
+y_nonzero = find(y~=0);
+sig_start = y_nonzero(1);
+
+SAMP = cont_ca_sampler(y(sig_start:end),params);
+SAMP.C_rec = extract_C_YS(SAMP,y(sig_start:end));
+SAMP.sig_start = sig_start;
 
 spikeRaster = zeros(500, app.proc.num_frames);
 for rep = 1:500
-    temp = ceil(SAMP.ss{rep});
+    temp = ceil(SAMP.ss{rep})+sig_start-1;
     spikeRaster(rep,temp) = 1;
 end
 
