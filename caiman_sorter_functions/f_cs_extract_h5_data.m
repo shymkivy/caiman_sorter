@@ -1,112 +1,64 @@
 function est = f_cs_extract_h5_data(file_loc, dims)          
-    dataset_path = '/estimates';  
+dataset_path = '/estimates';  
+
+error_log = {};
+
+%% load components
+est_good = f_cs_load_h5_est(file_loc, dims, dataset_path);
+
+num_good_comp = numel(est_good.contours);
+
+%% check if components were already discarded into discarded pile
+
+dataset_path_discard = '/estimates/discarded_components';  
+A_data_disc = h5read(file_loc,[dataset_path_discard '/A/data']);
+if numel(A_data_disc) > 0
+    est_bad = f_cs_load_h5_est(file_loc, dims, dataset_path_discard, num_good_comp);
     
-    error_log = {};
+    % combine
+    est.A = [est_good.A, est_bad.A];
+    est.contours = [est_good.contours; est_bad.contours];
+    est.C = [est_good.C; est_bad.C];
+    est.F_dff = [est_good.F_dff; est_bad.F_dff];
+    est.R = [est_good.R; est_bad.R];
+    est.S = [est_good.S; est_bad.S];
+    est.YrA = [est_good.YrA; est_bad.YrA];
+    est.SNR_comp = [est_good.SNR_comp; est_bad.SNR_comp];
+    est.cnn_preds = [est_good.cnn_preds; est_bad.cnn_preds];
+    est.r_values = [est_good.r_values; est_bad.r_values];
+    est.SNR_comp = [est_good.SNR_comp; est_bad.SNR_comp];
+    est.sn = est_good.sn;
+    est.b = est_good.b;
+    est.f = est_good.f;
+    est.g = [est_good.g, est_bad.g];
+    est.idx_components = est_good.idx_components;
+    est.idx_components_bad = est_bad.idx_components_bad;
+    error_log = [est_good.error_log; est_bad.error_log];
+else
+    est = est_good;
+end
 
-    % recereate A
-    A_data = h5read(file_loc,[dataset_path '/A/data']);
-    A_indices = h5read(file_loc,[dataset_path '/A/indices']) + 1; % python offset
-    A_indptr = h5read(file_loc,[dataset_path '/A/indptr']);
-    A_shape = h5read(file_loc,[dataset_path '/A/shape']);
+%% extact params
+hinfo = h5info(file_loc);
 
-    A = zeros(A_shape', 'single');
-    contours = cell(numel(A_indptr)-1,1);
-    for ii = 1:numel(A_indptr)-1         
-        temp_indices = A_indices(A_indptr(ii)+1:A_indptr(ii+1));
-
-        A(temp_indices,ii) = A_data(A_indptr(ii)+1:A_indptr(ii+1));
-
-        [y_temp, x_temp] = ind2sub(dims, temp_indices);
-        indx_temp = boundary(x_temp, y_temp);
-        contours{ii} = [x_temp(indx_temp),y_temp(indx_temp)];
+init_params = struct;
+for n_pg = 1:numel(hinfo.Groups(2).Groups)
+    [~, g_name, ~] = fileparts(hinfo.Groups(2).Groups(n_pg).Name);
+    init_params.(g_name) = struct;
+    for n_pgg = 1:numel(hinfo.Groups(2).Groups(n_pg).Datasets)
+        [~, gd_name, ~] = fileparts(hinfo.Groups(2).Groups(n_pg).Datasets(n_pgg).Name);
+        init_params.(g_name).(gd_name) = h5read(file_loc, [hinfo.Groups(2).Groups(n_pg).Name '/' hinfo.Groups(2).Groups(n_pg).Datasets(n_pgg).Name]);
     end
+end
 
-    est.A = A;
-    est.contours = contours;
+eval_params.SNR_lowest_thresh =  double(h5read(file_loc, '/params/quality/SNR_lowest'));
+eval_params.SNR_thresh =         double(h5read(file_loc, '/params/quality/min_SNR'));
+eval_params.cnn_lowest_thresh =  double(h5read(file_loc, '/params/quality/cnn_lowest'));
+eval_params.cnn_thresh =         double(h5read(file_loc, '/params/quality/min_cnn_thr'));
+eval_params.rval_lowest_thresh = double(h5read(file_loc, '/params/quality/rval_lowest'));
+eval_params.rval_thresh =        double(h5read(file_loc, '/params/quality/rval_thr'));
 
-
-    % recreate C
-    est.C = h5read(file_loc,[dataset_path '/C'])';
-    est.F_dff = h5read(file_loc,[dataset_path '/F_dff'])';
-    est.R = h5read(file_loc,[dataset_path '/R'])';
-    est.S = h5read(file_loc,[dataset_path '/S'])';
-    est.YrA = h5read(file_loc,[dataset_path '/YrA'])';
-
-
-    % comp evaluation
-    est.SNR_comp = h5read(file_loc,[dataset_path '/SNR_comp']);
-    est.cnn_preds = h5read(file_loc,[dataset_path '/cnn_preds']);
-    est.r_values = h5read(file_loc,[dataset_path '/r_values']);
-
-
-    % background
-    est.sn = h5read(file_loc,[dataset_path '/sn']);
-    % spatial background
-    est.b = h5read(file_loc,[dataset_path '/b']);
-    % temporal background
-    est.f = h5read(file_loc,[dataset_path '/f']);
-
-    est.g = h5read(file_loc,[dataset_path '/g']);
-
-    % index of good and bad
-    est.idx_components = h5read(file_loc,[dataset_path '/idx_components']);
-    est.idx_components_bad = h5read(file_loc,[dataset_path '/idx_components_bad']);
-
-    if iscell(est.idx_components)
-        if strcmp(est.idx_components{1}, 'NoneType')
-            %no index assigned
-            est.idx_components = 0:(A_shape(2)-1);
-            est.idx_components_bad = [];
-
-            error_log = {error_log; 'Components were not evaluated in caiman'};
-        end
-    end
-  
-    if iscell(est.SNR_comp)
-        if strcmp(est.idx_components{1}, 'NoneType')
-            est.SNR_comp = zeros(A_shape(2),1);
-            error_log = {error_log; 'SNR was not evaluated in caiman'};
-        end
-    end
-    if iscell(est.cnn_preds)
-        if strcmp(est.idx_components{1}, 'NoneType')
-            est.cnn_preds = zeros(A_shape(2),1);
-            error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
-        end
-    end
-    if iscell(est.r_values)
-        if strcmp(est.idx_components{1}, 'NoneType')
-            est.r_values = zeros(A_shape(2),1);
-            error_log = {error_log; 'R-values were not evaluated in caiman'};
-        end
-    end
-
-    est.idx_components = est.idx_components + 1; % python offset
-    est.idx_components_bad = est.idx_components_bad + 1; % python offset
-
-    % extact params
-    hinfo = h5info(file_loc);
-
-    init_params = struct;
-    for n_pg = 1:numel(hinfo.Groups(2).Groups)
-        [~, g_name, ~] = fileparts(hinfo.Groups(2).Groups(n_pg).Name);
-        init_params.(g_name) = struct;
-        for n_pgg = 1:numel(hinfo.Groups(2).Groups(n_pg).Datasets)
-            [~, gd_name, ~] = fileparts(hinfo.Groups(2).Groups(n_pg).Datasets(n_pgg).Name);
-            init_params.(g_name).(gd_name) = h5read(file_loc, [hinfo.Groups(2).Groups(n_pg).Name '/' hinfo.Groups(2).Groups(n_pg).Datasets(n_pgg).Name]);
-        end
-    end
-
-    %
-
-    eval_params.SNR_lowest_thresh =  double(h5read(file_loc, '/params/quality/SNR_lowest'));
-    eval_params.SNR_thresh =         double(h5read(file_loc, '/params/quality/min_SNR'));
-    eval_params.cnn_lowest_thresh =  double(h5read(file_loc, '/params/quality/cnn_lowest'));
-    eval_params.cnn_thresh =         double(h5read(file_loc, '/params/quality/min_cnn_thr'));
-    eval_params.rval_lowest_thresh = double(h5read(file_loc, '/params/quality/rval_lowest'));
-    eval_params.rval_thresh =        double(h5read(file_loc, '/params/quality/rval_thr'));
-    
-    est.eval_params_caiman = eval_params;
-    est.init_params_caiman = init_params;
-    est.extraction_error_log = error_log;
+est.eval_params_caiman = eval_params;
+est.init_params_caiman = init_params;
+est.extraction_error_log = error_log;
 end
