@@ -20,8 +20,8 @@ if path
 end
 
 drawnow; pause(0.05);
-%app.UIFigure.Visible = 'off';
-%app.UIFigure.Visible = 'on';
+app.UIFigure.Visible = 'off';
+app.UIFigure.Visible = 'on';
 if isequal(file_name,0)
    disp('User selected Cancel');
 else

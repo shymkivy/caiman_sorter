@@ -58,11 +58,26 @@ function est = f_cs_extract_h5_data(file_loc, dims)
             est.idx_components = 0:(A_shape(2)-1);
             est.idx_components_bad = [];
 
+            error_log = {error_log; 'Components were not evaluated in caiman'};
+        end
+    end
+  
+    if iscell(est.SNR_comp)
+        if strcmp(est.idx_components{1}, 'NoneType')
             est.SNR_comp = zeros(A_shape(2),1);
+            error_log = {error_log; 'SNR was not evaluated in caiman'};
+        end
+    end
+    if iscell(est.cnn_preds)
+        if strcmp(est.idx_components{1}, 'NoneType')
             est.cnn_preds = zeros(A_shape(2),1);
+            error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
+        end
+    end
+    if iscell(est.r_values)
+        if strcmp(est.idx_components{1}, 'NoneType')
             est.r_values = zeros(A_shape(2),1);
-
-            error_log = {error_log; 'Components were not evaluate in caiman'};
+            error_log = {error_log; 'R-values were not evaluated in caiman'};
         end
     end
 
