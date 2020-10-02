@@ -7,13 +7,29 @@ A_indices = h5read(file_loc,[dataset_path '/A/indices']) + 1; % python offset
 A_indptr = h5read(file_loc,[dataset_path '/A/indptr']);
 A_shape = h5read(file_loc,[dataset_path '/A/shape']);
 
-A = zeros(A_shape', 'single');
+% A = zeros(A_shape', 'single');
+% contours = cell(numel(A_indptr)-1,1);
+% for ii = 1:numel(A_indptr)-1         
+%     temp_indices = A_indices(A_indptr(ii)+1:A_indptr(ii+1));
+% 
+%     A(temp_indices,ii) = A_data(A_indptr(ii)+1:A_indptr(ii+1));
+% 
+%     [y_temp, x_temp] = ind2sub(dims, temp_indices);
+%     indx_temp = boundary(x_temp, y_temp);
+%     contours{ii} = [x_temp(indx_temp),y_temp(indx_temp)];
+% end
+
+% get A
+cell_coeffs = zeros(numel(A_data),1);
+for ii = 1:numel(A_indptr)-1 
+    cell_coeffs(A_indptr(ii)+1:A_indptr(ii+1)) = ii;
+end
+A = sparse(double(A_indices), cell_coeffs, double(A_data), double(A_shape(1)), double(A_shape(2)));
+
+% get concours for plots
 contours = cell(numel(A_indptr)-1,1);
-for ii = 1:numel(A_indptr)-1         
+for ii = 1:numel(A_indptr)-1 
     temp_indices = A_indices(A_indptr(ii)+1:A_indptr(ii+1));
-
-    A(temp_indices,ii) = A_data(A_indptr(ii)+1:A_indptr(ii+1));
-
     [y_temp, x_temp] = ind2sub(dims, temp_indices);
     indx_temp = boundary(x_temp, y_temp);
     contours{ii} = [x_temp(indx_temp),y_temp(indx_temp)];

@@ -5,6 +5,7 @@ function f_cs_button_down(app, src, fig_type)
     indx_current =  sub2ind(app.proc.dims', coord(2), coord(1));
     selection_type = app.UIFigure.SelectionType;
     app.last_cell_num = app.current_cell_num;
+    
 
     if strcmp(selection_type, 'alt')
         if strcmp(fig_type, 'accepted')
@@ -20,7 +21,7 @@ function f_cs_button_down(app, src, fig_type)
     if strcmp(fig_type, 'accepted')
         pix_vals = app.est.A(indx_current,app.proc.comp_accepted);
         [temp_val, temp_cell_ind] = max(pix_vals);
-        if temp_val > 0
+        if full(temp_val) > 0
             app.current_cell_num = app.proc.idx_components(temp_cell_ind);
             if strcmp(selection_type, 'alt')
                 if strcmp(app.ManualEditsSwitch.Value,'On')
@@ -33,7 +34,7 @@ function f_cs_button_down(app, src, fig_type)
     elseif strcmp(fig_type, 'rejected')
         pix_vals = app.est.A(indx_current,~app.proc.comp_accepted);
         [temp_val, temp_cell_ind] = max(pix_vals);
-        if temp_val > 0
+        if full(temp_val) > 0
             app.current_cell_num = app.proc.idx_components_bad(temp_cell_ind);
             if strcmp(selection_type, 'alt')
                 if strcmp(app.ManualEditsSwitch.Value,'On')

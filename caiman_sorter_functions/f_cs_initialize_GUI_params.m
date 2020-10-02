@@ -1,7 +1,6 @@
 function f_cs_initialize_GUI_params(app)
 
 % precompute variables
-app.A3d = reshape(app.est.A, app.est.dims(1), app.est.dims(2) ,[]);
 app.num_cells = size(app.est.C,1);
 app.num_frames = size(app.est.C,2);
 app.idx_components_all = 1:app.num_cells;

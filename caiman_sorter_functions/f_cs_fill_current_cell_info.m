@@ -8,7 +8,7 @@ app.FiringstabilityEditField.Value = num2str(app.proc.firing_stab_vals(app.curre
 app.PeaksaveEditField.Value = num2str(app.proc.peaks_ave(app.current_cell_num));
 app.StdnoiseEditField.Value = num2str(app.proc.noise(app.current_cell_num));
 % extract the zoomed cell and make it square axis
-current_A = app.A3d(:,:,app.current_cell_num);
+current_A = reshape(full(app.est.A(:,app.current_cell_num)),app.est.dims(1),app.est.dims(2));
 imagesc(app.UIAxes_component, current_A);
 if app.proc.comp_accepted(app.current_cell_num)
     title(app.UIAxes_component, sprintf('Accepted cell %d', app.current_cell_num));
@@ -55,10 +55,12 @@ if isobject(app.ARmodelSwitchMCMC)
         else
             app.PlotMCMCSwitch.Enable = 0;
         end
-        if ~isempty(app.proc.deconv.MCMC.SAMP{app.current_cell_num})
-            app.PlotMCMCSAMPLESdetailsButton.Enable = 1;
-        else
-            app.PlotMCMCSAMPLESdetailsButton.Enable = 0;
+        if ~isempty(app.proc.deconv.MCMC.SAMP)
+            if ~isempty(app.proc.deconv.MCMC.SAMP{app.current_cell_num})
+                app.PlotMCMCSAMPLESdetailsButton.Enable = 1;
+            else
+                app.PlotMCMCSAMPLESdetailsButton.Enable = 0;
+            end
         end
     else
         app.PlotMCMCSwitch.Enable = 0;

@@ -26,9 +26,6 @@ if ~isempty(app.file_loc)
     elseif strcmp(ext,'.mat')
         app.mat_file_loc = app.file_loc;
         temp_load = load(app.mat_file_loc);
-        if ~issparse(temp_load.est.A)
-            temp_load.est.A = sparse(double(temp_load.est.A));
-        end
         app.est = temp_load.est;
         if isfield(temp_load, 'dims')
             app.est.dims = temp_load.dims;
