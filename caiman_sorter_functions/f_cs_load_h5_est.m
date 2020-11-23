@@ -76,7 +76,45 @@ if iscell(est.idx_components)
 
         error_log = {error_log; 'Components were not evaluated in caiman'};
     end
+elseif ischar(est.idx_components)
+    if strcmp(est.idx_components, 'NoneType')
+        %no index assigned
+        if ~exist('disc_offset', 'var')
+            est.idx_components = 0:(A_shape(2)-1);
+            est.idx_components_bad = [];
+        else
+            est.idx_components = [];
+            est.idx_components_bad = (0:(A_shape(2)-1))+disc_offset;
+        end
+
+        error_log = {error_log; 'Components were not evaluated in caiman'};
+    end
 end
+
+if iscell(est.idx_components_bad)
+    if strcmp(est.idx_components_bad{1}, 'NoneType')
+        %no index assigned
+        if ~exist('disc_offset', 'var')
+            est.idx_components_bad = [];
+        else
+            est.idx_components_bad = (0:(A_shape(2)-1))+disc_offset;
+        end
+
+        error_log = {error_log; 'Components were not evaluated in caiman'};
+    end
+elseif ischar(est.idx_components_bad)
+    if strcmp(est.idx_components_bad, 'NoneType')
+        %no index assigned
+        if ~exist('disc_offset', 'var')
+            est.idx_components_bad = [];
+        else
+            est.idx_components_bad = (0:(A_shape(2)-1))+disc_offset;
+        end
+
+        error_log = {error_log; 'Components were not evaluated in caiman'};
+    end
+end
+
 est.idx_components = est.idx_components + 1; % python offset
 est.idx_components_bad = est.idx_components_bad + 1; % python offset
 
