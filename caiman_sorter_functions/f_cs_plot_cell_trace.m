@@ -2,7 +2,7 @@ function f_cs_plot_cell_trace(app)
     % cell trace
     fr = double(app.est.init_params_caiman.data.fr);
     plot_time = (1:app.proc.num_frames)/fr;
-    app.UIAxes_ca_trace.cla
+    cla(app.UIAxes_ca_trace)
     title(app.UIAxes_ca_trace, sprintf('Ca trace, cell %d', app.current_cell_num));
     if strcmp(app.PlotLastCSwitch.Value, 'On')
         hold(app.UIAxes_ca_trace, 'on');

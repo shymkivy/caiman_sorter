@@ -1,7 +1,8 @@
 # caiman_sorter
 sort cells after processing with caiman/onacid
 
-Matlab 2019a tested
+Matlab 2020b
+	signal processing toolbox
 
 Dependencies:
   For MCMC deconvolution:

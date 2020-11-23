@@ -85,15 +85,32 @@ if iscell(est.SNR_comp)
         est.SNR_comp = zeros(A_shape(2),1);
         error_log = {error_log; 'SNR was not evaluated in caiman'};
     end
+elseif ischar(est.SNR_comp)
+    if strcmp(est.SNR_comp, 'NoneType')
+        est.SNR_comp = zeros(A_shape(2),1);
+        error_log = {error_log; 'SNR was not evaluated in caiman'};
+    end
 end
+
 if iscell(est.cnn_preds)
     if strcmp(est.cnn_preds{1}, 'NoneType')
         est.cnn_preds = zeros(A_shape(2),1);
         error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
     end
+elseif ischar(est.cnn_preds)
+    if strcmp(est.cnn_preds, 'NoneType')
+        est.cnn_preds = zeros(A_shape(2),1);
+        error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
+    end
 end
+
 if iscell(est.r_values)
     if strcmp(est.r_values{1}, 'NoneType')
+        est.r_values = zeros(A_shape(2),1);
+        error_log = {error_log; 'R-values were not evaluated in caiman'};
+    end
+elseif ischar(est.r_values)
+    if strcmp(est.r_values, 'NoneType')
         est.r_values = zeros(A_shape(2),1);
         error_log = {error_log; 'R-values were not evaluated in caiman'};
     end
