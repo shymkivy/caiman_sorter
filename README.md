@@ -1,7 +1,7 @@
 # caiman_sorter
 sort cells after processing with caiman/onacid
 
-Matlab 2020b
+Matlab 2020b:
 	signal processing toolbox
 
 Dependencies:
