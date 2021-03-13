@@ -140,6 +140,9 @@ elseif ischar(est.cnn_preds)
         est.cnn_preds = zeros(A_shape(2),1);
         error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
     end
+elseif isempty(est.cnn_preds)
+    est.cnn_preds = zeros(A_shape(2),1);
+    error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
 end
 
 if iscell(est.r_values)
