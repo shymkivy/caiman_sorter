@@ -154,6 +154,20 @@ elseif ischar(est.r_values)
     end
 end
 
+if iscell(est.b)
+    if strcmp(est.b{1}, 'NoneType')
+        est.b = zeros(1,size(A,1));
+        est.f = zeros(size(est.C,2),1);
+        error_log = {error_log; 'b and f were not evaluated in caiman'};
+    end
+elseif ischar(est.b)
+    if strcmp(est.b, 'NoneType')
+        est.b = zeros(1,size(A,1));
+        est.f = zeros(size(est.C,2),1);
+        error_log = {error_log; 'b and f were not evaluated in caiman'};
+    end
+end
+
 est.error_log = error_log;
 
 end
