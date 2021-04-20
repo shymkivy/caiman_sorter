@@ -15,8 +15,17 @@ hinfo = h5info(file_loc);
 
 est_idx = strcmpi('/estimates', {hinfo.Groups.Name});
 disc_comp_idx = strcmpi('discarded_components', {hinfo.Groups(est_idx).Datasets.Name});
+add_disc = 0;
+if ~sum(disc_comp_idx)
+    add_disc = 1;
+else
+    if ~isempty(hinfo.Groups(est_idx).Datasets(disc_comp_idx).Dataspace.Size)
+        add_disc = 1;
+    end
+end
 
-if ~isempty(hinfo.Groups(est_idx).Datasets(disc_comp_idx).Dataspace.Size)
+
+if add_disc
     dataset_path_discard = '/estimates/discarded_components';
     A_data_disc = h5read(file_loc,[dataset_path_discard '/A/data']);
     if numel(A_data_disc) > 0

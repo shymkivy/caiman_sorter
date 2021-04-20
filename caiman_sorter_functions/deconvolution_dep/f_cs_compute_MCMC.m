@@ -24,17 +24,21 @@ elseif params.p == 2
     end
 end
 
+num_samples = app.MCMCNNumberOfSamples.Value;
+
+% for some reason it breaks when Y is zeros, so remove that part
 y_nonzero = find(y~=0);
 sig_start = y_nonzero(1);
 
-spikeRaster = zeros(500, app.proc.num_frames);
+spikeRaster = zeros(num_samples, app.proc.num_frames);
 
 try
     SAMP = cont_ca_sampler(y(sig_start:end),params);
-    SAMP.C_rec = extract_C_YS(SAMP,y(sig_start:end));
+    % need to reconstructing cropped signal, cuz there is Cin parameter for initial c
+    SAMP.C_rec = extract_C_YS(SAMP,y(sig_start:end)); % 
     
-    for rep = 1:500
-        temp = ceil(SAMP.ss{rep})+sig_start-1;
+    for rep = 1:num_samples
+        temp = ceil(SAMP.ss{rep}) + sig_start - 1;
         spikeRaster(rep,temp) = 1;
     end
     
@@ -42,10 +46,11 @@ catch
     warning(['Cell ' num2str(n_cell) ' error in MCMC, splitting in 2'])
     second_start = floor((numel(y)-sig_start)/2)+sig_start;
     samp1 = cont_ca_sampler(y(sig_start:second_start),params);
-    samp1.C_rec = extract_C_YS(samp1,y(sig_start:second_start));
     samp2 = cont_ca_sampler(y((second_start+1):end),params);
+    
+    samp1.C_rec = extract_C_YS(samp1,y(sig_start:second_start));
     samp2.C_rec = extract_C_YS(samp2,y((second_start+1):end));
-     
+    
     for rep = 1:500
         temp1 = ceil(samp1.ss{rep})+sig_start-1;
         temp2 = ceil(samp2.ss{rep})+second_start;
@@ -55,7 +60,7 @@ catch
     
     SAMP.samp1 = samp1;
     SAMP.samp2 = samp2;
-    SAMP.C_rec = [mean(samp1.C_rec,1), mean(samp2.C_rec,1)];
+    SAMP.C_rec = [samp1.C_rec, samp2.C_rec];
     SAMP.error  = 'data needed to be split in 2 for MCMC';
     SAMP.second_start = second_start;
 end
@@ -66,7 +71,8 @@ if app.SaveSamplesOutputsMCMC.Value
     app.proc.deconv.MCMC.SAMP{n_cell} = SAMP;
 end
 
-app.proc.deconv.MCMC.C{n_cell} = mean(SAMP.C_rec,1);
+% need to fill in the zeros here for unprocessed signal
+app.proc.deconv.MCMC.C{n_cell} = [zeros(1,sig_start-1), mean(SAMP.C_rec,1)];
 app.proc.deconv.MCMC.S{n_cell} = mean(spikeRaster,1);
 
 %     figure; imagesc(spikeRaster)
