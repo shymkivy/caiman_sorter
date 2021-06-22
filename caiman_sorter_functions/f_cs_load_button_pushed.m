@@ -10,7 +10,7 @@ if ~isempty(app.file_loc)
     clear app.proc app.est
     
     % process h5 file if opened\
-    if strcmp(ext,'.hdf5')
+    if strcmpi(ext,'.hdf5') || strcmpi(ext,'.hdf') || strcmpi(ext,'.h5')
         temp_dims = h5read(app.file_loc,'/estimates/dims');
         % import caiman settings
         app.est = f_cs_extract_h5_data(app.file_loc, temp_dims);

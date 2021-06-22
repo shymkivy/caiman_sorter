@@ -7,7 +7,6 @@ function smooth_dfdt_data = f_smooth_dfdt3(data, do_smooth, sigma_frames, normal
 %   rectify -       do rectification; true(default) or false 
 %
 
-
 if ~exist('do_smooth', 'var') || isempty(do_smooth)
     do_smooth = 1; % default
 end
