@@ -35,8 +35,10 @@ if add_disc
         est.A = [est_good.A, est_bad.A];
         est.contours = [est_good.contours; est_bad.contours];
         est.C = [est_good.C; est_bad.C];
-        if ischar(est_bad.F_dff)
-            est.F_dff = [est_good.F_dff; zeros(size(est_bad.C))];
+        if iscell(est_bad.F_dff)
+            if strcmp(est.idx_components{1}, 'NoneType')
+                est.F_dff = [est_good.F_dff; zeros(size(est_bad.C))];
+            end
         else
             est.F_dff = [est_good.F_dff; est_bad.F_dff];
         end
