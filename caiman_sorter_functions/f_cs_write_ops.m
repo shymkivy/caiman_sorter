@@ -34,13 +34,14 @@ if isfield(ops, 'eval_params2')
         app.EditFieldSNR2.Value =               eval_params2.RejThrSNR2;
         app.EditFieldCNN.Value =                eval_params2.RejThrCNN;
         app.EditFieldRvalues.Value =            eval_params2.RejThrRvalues;
-        app.EditFieldMinSigFrac.Value =         eval_params2.RejThrRvalues;
+        app.EditFieldMinSigFrac.Value =         eval_params2.RejThrMinSigFrac;
         app.EditFieldFiringStability.Value =    eval_params2.FiringStability;
         app.CheckBoxSNRcaiman.Value =           eval_params2.EvalSNRcaiman;
         app.CheckBoxSNR2.Value =                eval_params2.EvalSNR2;
         app.CheckBoxCNN.Value =                 eval_params2.EvalCNN;
         app.CheckBoxRvalues.Value =             eval_params2.EvalRvalues;
         app.CheckBoxMinSigFrac.Value =          eval_params2.EvalMinSigFrac;
+        app.CheckBoxFiringStability.Value =     eval_params2.EvalFiringStability;
     catch
         f_cs_update_log(app, 'Unable to write eval_params2 ops');
     end

@@ -15,13 +15,14 @@ eval_params2.RejThrSNRCaiman =          app.EditFieldSNRcaiman.Value;
 eval_params2.RejThrSNR2 =               app.EditFieldSNR2.Value;
 eval_params2.RejThrCNN =                app.EditFieldCNN.Value;
 eval_params2.RejThrRvalues =            app.EditFieldRvalues.Value;
-eval_params2.RejThrRvalues =            app.EditFieldMinSigFrac.Value;
+eval_params2.RejThrMinSigFrac =         app.EditFieldMinSigFrac.Value;
 eval_params2.FiringStability =          app.EditFieldFiringStability.Value;
 eval_params2.EvalSNRcaiman =            app.CheckBoxSNRcaiman.Value;
 eval_params2.EvalSNR2 =                 app.CheckBoxSNR2.Value;
 eval_params2.EvalCNN =                  app.CheckBoxCNN.Value;
 eval_params2.EvalRvalues =              app.CheckBoxRvalues.Value;
 eval_params2.EvalMinSigFrac =           app.CheckBoxMinSigFrac.Value;
+eval_params2.EvalFiringStability =      app.CheckBoxFiringStability.Value;
 
 %% deconvolution params
 % smooth df/dt

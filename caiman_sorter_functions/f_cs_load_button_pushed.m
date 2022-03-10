@@ -19,8 +19,10 @@ if ~isempty(app.file_loc)
         app.ops.init_params_caiman = app.est.init_params_caiman;
         f_cs_update_log(app, ['Loaded .hdf5: ' strrep(app.file_loc, '\', '\\')])
         app.mat_file_loc = [filepath '\' filename '_sort.mat'];
-
-        app.proc = f_cs_initialize_new_proc(app);
+        
+        f_cs_update_log(app, 'Initializing proc data...');
+        app.proc = f_cs_initialize_new_proc(app.est, app.ops);
+        
         f_cs_update_log(app, 'Loaded caiman estimated components')
 
     elseif strcmp(ext,'.mat')
