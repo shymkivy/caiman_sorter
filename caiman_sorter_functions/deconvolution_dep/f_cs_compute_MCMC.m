@@ -24,7 +24,7 @@ elseif params.p == 2
     end
 end
 
-SAMP = f_cs_compute_MCMC_core(y, params);
+[SAMP, spikeRaster] = f_cs_compute_MCMC_core(y, params);
 
 if app.SaveSamplesOutputsMCMC.Value
     app.proc.deconv.MCMC.SAMP{n_cell} = SAMP;
