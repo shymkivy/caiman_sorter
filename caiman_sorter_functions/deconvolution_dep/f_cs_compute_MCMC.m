@@ -32,7 +32,7 @@ end
 
 if SAMP.process_ok
     % need to fill in the zeros here for unprocessed signal
-    app.proc.deconv.MCMC.C{n_cell} = [zeros(1,sig_start-1), mean(SAMP.C_rec,1)];
+    app.proc.deconv.MCMC.C{n_cell} = [zeros(1,SAMP.sig_start-1), mean(SAMP.C_rec,1)];
     app.proc.deconv.MCMC.S{n_cell} = mean(spikeRaster,1);
 end
 %     figure; imagesc(spikeRaster)
