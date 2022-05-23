@@ -16,17 +16,22 @@ proc.comp_accepted = proc.comp_accepted_core;
 %%  average of top peaks
 %f_cs_update_log(app, 'Computing SNR and time constants...');
 proc.peaks_to_ave = 5;      % for SNR and and peaks computation
-proc.peak_bin_size = 3;     % in sec, for firinf stability
+proc.peak_bin_zero_size = 10;     % in sec, for firing stability
+proc.peak_bin_sig_size = .4;        % sec take median around peak
 
-bin_size = floor((proc.peak_bin_size * double(ops.init_params_caiman.data.fr))/2);
+bin_size_zero_half = floor((proc.peak_bin_zero_size * double(ops.init_params_caiman.data.fr))/2);
+bin_size_sig = floor((proc.peak_bin_sig_size * double(ops.init_params_caiman.data.fr)));
 
 proc.peaks_ave = zeros(proc.num_cells,1);
 temp_peaks = zeros(proc.peaks_to_ave,1);
 for n_cell = 1:proc.num_cells
-    temp_C = est.C(n_cell,:);
+    temp_C = est.C(n_cell,:) + est.YrA(n_cell,:);
     for n_peak = 1:proc.peaks_to_ave     
-        [temp_peaks(n_peak), m_ind] = max(temp_C);
-        temp_C(max(m_ind-bin_size,1): min(m_ind+bin_size,proc.num_frames)) = 0;
+        [~, m_ind] = max(temp_C);
+        start1 = m_ind - floor(bin_size_sig/2);
+        end1 = start1 + bin_size_sig-1;
+        temp_peaks(n_peak) = median(temp_C(start1:end1));
+        temp_C(max(m_ind-bin_size_zero_half,1): min(m_ind+bin_size_zero_half,proc.num_frames)) = 0;
     end
     %figure; plot(temp_C); title(num2str(n_peak))
     proc.peaks_ave(n_cell) = mean(temp_peaks);

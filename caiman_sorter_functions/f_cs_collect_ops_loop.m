@@ -11,7 +11,7 @@ eval_params_caiman.rval_lowest_thresh = -1;
 
 % other method
 eval_params2.RejThrSNRCaiman =          2;
-eval_params2.RejThrSNR2 =               4;
+eval_params2.RejThrSNR2 =               3;
 eval_params2.RejThrCNN =                0.5;
 eval_params2.RejThrRvalues =            0.5;
 eval_params2.RejThrMinSigFrac =         0.5;
