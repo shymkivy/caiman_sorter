@@ -26,10 +26,11 @@ proc.peaks_ave = zeros(proc.num_cells,1);
 temp_peaks = zeros(proc.peaks_to_ave,1);
 for n_cell = 1:proc.num_cells
     temp_C = est.C(n_cell,:) + est.YrA(n_cell,:);
+    size_c = numel(temp_C);
     for n_peak = 1:proc.peaks_to_ave     
         [~, m_ind] = max(temp_C);
-        start1 = m_ind - floor(bin_size_sig/2);
-        end1 = start1 + bin_size_sig-1;
+        start1 = max(m_ind - floor(bin_size_sig/2),1);
+        end1 = min(start1 + bin_size_sig-1, size_c);
         temp_peaks(n_peak) = median(temp_C(start1:end1));
         temp_C(max(m_ind-bin_size_zero_half,1): min(m_ind+bin_size_zero_half,proc.num_frames)) = 0;
     end
