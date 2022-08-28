@@ -2,7 +2,9 @@ function f_cs_button_down(app, src, fig_type)
     % get coordinates of mouse click and type of click
     info = get(src);
     coord = round(info.Parent.CurrentPoint(1,1:2));
-    indx_current =  sub2ind(app.proc.dims', coord(2), coord(1));
+    coord1 = min(max(coord(1), 0), double(app.proc.dims(1)));
+    coord2 = min(max(coord(2), 0), double(app.proc.dims(2)));
+    indx_current =  sub2ind(app.proc.dims', coord2, coord1);
     selection_type = app.UIFigure.SelectionType;
     app.last_cell_num = app.current_cell_num;
     

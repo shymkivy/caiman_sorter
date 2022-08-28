@@ -20,6 +20,7 @@ elseif p == 2
     end
 end
 
+options.fudge_factor = app.FudgeFactorEditField.Value;
 options.p = p;
 %options.method = 'dual';
 

@@ -16,7 +16,7 @@ if exist(ops_path, 'file')
     ops = ops_temp.ops;
     ops.ops_path = ops_path;
     f_cs_update_log(app, ['ops loaded path: ' ops.ops_path]);
-    if ~strcmpi(ops_temp.ops.ops_path, ops_path)
+    if ~isfield(ops_temp.ops, 'ops_path') || ~strcmpi(ops_temp.ops.ops_path, ops_path)
         disp('RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
         f_cs_update_log(app, 'RAFA: Welcome new user, you should join the Yuste lab, it is great, no?');
     end
