@@ -35,19 +35,20 @@ proc.comp_accepted_core = proc.comp_accepted_core(1:num_cells_pre);
 proc.idx_components = proc.idx_components(proc.idx_components<=num_cells_pre);
 proc.idx_components_bad = proc.idx_components_bad(proc.idx_components_bad<=num_cells_pre);
 
-proc.deconv.smooth_dfdt.S = proc.deconv.smooth_dfdt.S(1:num_cells_pre,:);
-proc.deconv.smooth_dfdt.S_std = proc.deconv.smooth_dfdt.S_std(1:num_cells_pre);
+if isfield(proc, 'devonv')
+    proc.deconv.smooth_dfdt.S = proc.deconv.smooth_dfdt.S(1:num_cells_pre,:);
+    proc.deconv.smooth_dfdt.S_std = proc.deconv.smooth_dfdt.S_std(1:num_cells_pre);
 
-if isfield(proc.deconv, 'MCMC')
-    proc.deconv.MCMC.C = proc.deconv.MCMC.C(1:num_cells_pre);
-    proc.deconv.MCMC.S = proc.deconv.MCMC.S(1:num_cells_pre);
-    proc.deconv.MCMC.SAMP = proc.deconv.MCMC.SAMP(1:num_cells_pre);
+    if isfield(proc.deconv, 'MCMC')
+        proc.deconv.MCMC.C = proc.deconv.MCMC.C(1:num_cells_pre);
+        proc.deconv.MCMC.S = proc.deconv.MCMC.S(1:num_cells_pre);
+        proc.deconv.MCMC.SAMP = proc.deconv.MCMC.SAMP(1:num_cells_pre);
+    end
+    if isfield(proc.deconv, 'c_foopsi')
+        proc.deconv.c_foopsi.C = proc.deconv.c_foopsi.C(1:num_cells_pre);
+        proc.deconv.c_foopsi.g = proc.deconv.c_foopsi.g(1:num_cells_pre);
+        proc.deconv.c_foopsi.p = proc.deconv.c_foopsi.p(1:num_cells_pre);
+        proc.deconv.c_foopsi.S = proc.deconv.c_foopsi.S(1:num_cells_pre);
+    end
 end
-if isfield(proc.deconv, 'c_foopsi')
-    proc.deconv.c_foopsi.C = proc.deconv.c_foopsi.C(1:num_cells_pre);
-    proc.deconv.c_foopsi.g = proc.deconv.c_foopsi.g(1:num_cells_pre);
-    proc.deconv.c_foopsi.p = proc.deconv.c_foopsi.p(1:num_cells_pre);
-    proc.deconv.c_foopsi.S = proc.deconv.c_foopsi.S(1:num_cells_pre);
-end
-
 end
