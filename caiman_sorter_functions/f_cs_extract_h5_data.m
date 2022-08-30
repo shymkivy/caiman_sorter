@@ -65,7 +65,6 @@ end
 
 %% extact params
 
-
 init_params = struct;
 for n_pg = 1:numel(hinfo.Groups(2).Groups)
     [~, g_name, ~] = fileparts(hinfo.Groups(2).Groups(n_pg).Name);
@@ -86,4 +85,5 @@ eval_params.rval_thresh =        double(h5read(file_loc, '/params/quality/rval_t
 est.eval_params_caiman = eval_params;
 est.init_params_caiman = init_params;
 est.extraction_error_log = error_log;
+est.num_cells_original = size(est.C,1);
 end

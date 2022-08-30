@@ -15,28 +15,19 @@ proc.comp_accepted = proc.comp_accepted_core;
 
 %%  average of top peaks
 %f_cs_update_log(app, 'Computing SNR and time constants...');
-proc.peaks_to_ave = 5;      % for SNR and and peaks computation
-proc.peak_bin_zero_size = 10;     % in sec, for firing stability
-proc.peak_bin_sig_size = .4;        % sec take median around peak
 
-bin_size_zero_half = floor((proc.peak_bin_zero_size * double(ops.init_params_caiman.data.fr))/2);
-bin_size_sig = floor((proc.peak_bin_sig_size * double(ops.init_params_caiman.data.fr)));
+data = est.C + est.YrA;
 
-proc.peaks_ave = zeros(proc.num_cells,1);
-temp_peaks = zeros(proc.peaks_to_ave,1);
-for n_cell = 1:proc.num_cells
-    temp_C = est.C(n_cell,:) + est.YrA(n_cell,:);
-    size_c = numel(temp_C);
-    for n_peak = 1:proc.peaks_to_ave     
-        [~, m_ind] = max(temp_C);
-        start1 = max(m_ind - floor(bin_size_sig/2),1);
-        end1 = min(start1 + bin_size_sig-1, size_c);
-        temp_peaks(n_peak) = median(temp_C(start1:end1));
-        temp_C(max(m_ind-bin_size_zero_half,1): min(m_ind+bin_size_zero_half,proc.num_frames)) = 0;
-    end
-    %figure; plot(temp_C); title(num2str(n_peak))
-    proc.peaks_ave(n_cell) = mean(temp_peaks);
-end
+params.peaks_to_ave = 5;      % for SNR and and peaks computation
+params.peak_bin_zero_size = 10;     % in sec, for firing stability
+params.peak_bin_sig_size = .4;        % sec take median around peak
+params.fr = ops.init_params_caiman.data.fr;
+
+proc.peaks_ave = f_cs_compute_peaks_ave(data, params);
+
+proc.peaks_to_ave = params.peaks_to_ave;
+proc.peak_bin_zero_size = params.peak_bin_zero_size;
+proc.peak_bin_sig_size = params.peak_bin_sig_size;
 
 %%  number of missing values (zeros) in traces
 proc.num_zeros = zeros(proc.num_cells,1);
@@ -71,6 +62,6 @@ end
 proc.SNR2_vals = double(proc.peaks_ave./proc.noise);
 
 %%
-proc.firing_stab_vals = f_cs_compute_firing_stability(est, proc, ops);
+proc.firing_stab_vals = f_cs_compute_firing_stability(est.S, params);
 
 end

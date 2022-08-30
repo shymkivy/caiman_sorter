@@ -29,7 +29,7 @@ function f_cs_button_down(app, src, fig_type)
                 if strcmp(app.ManualEditsSwitch.Value,'On')
                     f_manual_remove_comp(app);
                     f_manual_remove_contour(app);
-                    f_cs_modify_bkg_img(app, add_accept_comp)
+                    f_cs_modify_bkg_img(app, add_accept_comp, app.current_cell_num)
                 end
             end
         end
@@ -42,7 +42,7 @@ function f_cs_button_down(app, src, fig_type)
                 if strcmp(app.ManualEditsSwitch.Value,'On')
                     f_manual_add_comp(app);
                     f_manual_add_contour(app);
-                    f_cs_modify_bkg_img(app, add_accept_comp)
+                    f_cs_modify_bkg_img(app, add_accept_comp, app.current_cell_num)
                 end
             end
         end

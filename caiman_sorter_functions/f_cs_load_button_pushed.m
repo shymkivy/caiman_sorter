@@ -17,6 +17,7 @@ if ~isempty(app.file_loc)
         app.est.dims = temp_dims;
         app.ops.eval_params_caiman = app.est.eval_params_caiman;
         app.ops.init_params_caiman = app.est.init_params_caiman;
+        
         f_cs_update_log(app, ['Loaded .hdf5: ' strrep(app.file_loc, '\', '\\')])
         app.mat_file_loc = [filepath '\' filename '_sort.mat'];
         
@@ -31,6 +32,11 @@ if ~isempty(app.file_loc)
         if ~issparse(temp_load.est.A)
             temp_load.est.A = sparse(double(temp_load.est.A));
         end
+        
+        if ~isfield(temp_load.est, 'num_cells_original')
+            temp_load.est.num_cells_original = size(temp_load.est.C,1);
+        end
+        
         app.est = temp_load.est;
         if isfield(temp_load, 'dims')
             app.est.dims = temp_load.dims;

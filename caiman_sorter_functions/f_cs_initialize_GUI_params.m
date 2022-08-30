@@ -3,7 +3,7 @@ function f_cs_initialize_GUI_params(app)
 % precompute variables
 app.num_cells = size(app.est.C,1);
 app.num_frames = size(app.est.C,2);
-app.idx_components_all = 1:app.num_cells;
+app.idx_components_all = (1:app.num_cells)';
 app.current_cell_num = 1;
 app.bkg_comp_weights = mean(app.est.C,2);
 app.bkg_bgkcomp = reshape((mean(app.est.f)*app.est.b)',app.est.dims(1),app.est.dims(2));
