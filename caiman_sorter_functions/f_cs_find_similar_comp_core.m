@@ -1,6 +1,6 @@
 function [est, proc] = f_cs_find_similar_comp_core(est, proc, params)
 
-merge_method = params.merge_method;
+method = params.merge_method; % 'weighted ave'; full mean corr; svd; nmf; choose better;
 apply_merge = params.apply_merge;
 plot_stuff = params.plot_stuff;
 spac_thr = params.spac_thr;
@@ -50,22 +50,55 @@ for n_cell = 1:num_cells_ov
         
         tr1 = trace(n_cell_acc1,:);
         tr2 = trace(n_cell_acc2,:);
-        
         A1 = A(:,n_cell_acc1);
         A2 = A(:,n_cell_acc2);
         
-        tr_comb = full(sum(A1))*tr1 + full(sum(A2))*tr2;
+        if strcmpi(method, 'weighted ave')
+            tr1_sum = sum(tr1);
+            tr2_sum = sum(tr2);
+            A1_sum = full(sum(A1));
+            A2_sum = full(sum(A2));
 
-        mean_tr1 = mean(tr1);
-        mean_tr2 = mean(tr2);
+            tr_comb = (tr1*A1_sum + tr2*A2_sum)/(A1_sum+A2_sum);
+            A_comb = (A1*tr1_sum + A2*tr2_sum)/(tr1_sum+tr2_sum);
+            A_comb_norm = norm(A_comb);
 
-        A_comb = (A1*mean_tr1 + A2*mean_tr2);
-        A_comb = A_comb/sum(A_comb);
+            A_combn = A_comb/A_comb_norm;
+            tr_combn = 2*tr_comb*A_comb_norm; % 2 because we are combining
+        else
+            % basically same result
+            if 1
+                A_mask = (A1+A2)>0;
+            else
+                A_mask = true(prod(dims),1);
+            end
+            
+            full1 = A1(A_mask)*tr1;
+            full2 = A2(A_mask)*tr2;
+            full_comb = full1+full2;
+            
+            if strcmpi(method, 'full mean corr')
+                full_trace1 = sum(full_comb,1);
+                full_trace1n = full_trace1/norm(full_trace1);
 
-        A_norm = norm(A_comb);
+                full_A = full_comb*full_trace1n';
+                full_A_norm = norm(full_A);
 
-        A_combn = A_comb/A_norm;
-        tr_combn = tr_comb*A_norm;
+                A_combn = zeros(prod(dims),1);
+                A_combn(A_mask) = full_A/full_A_norm;
+                tr_combn = full_trace1n*full_A_norm;
+            elseif strcmpi(method, 'svd')
+                [U, S, V] = svd(full_comb, 'econ');
+                tr_combn = V(:,1)*S(1,1);
+                A_combn(A_mask) = U(:,1);
+            elseif strcmpi(method, 'nmf')
+            [W,H] = nnmf(full_comb,1);
+            tr_combn = H*norm(W);
+            A_combn(A_mask) = W/norm(W);
+            else
+                error('method %s is undefined', method)
+            end
+        end
         
         A_merge{n_cell} = A_combn;
         tr_merge{n_cell} = tr_combn;
@@ -77,6 +110,7 @@ for n_cell = 1:num_cells_ov
             
             all_vals = [A1, A2, A_combn];
             max_val = full(max(all_vals(:)));
+            min_val = full(min(all_vals(:)));
             
             n_marg = find(sum(im_comb,1));
             m_marg = find(sum(im_comb,2));
@@ -86,13 +120,13 @@ for n_cell = 1:num_cells_ov
             figure; 
             subplot(2,3,1);
             imagesc(im1); title(sprintf('A1, cell%d', n_cell1)); 
-            axis equal tight; caxis([0 max_val]); ylim(m_lim); xlim(n_lim);
+            axis equal tight; caxis([min_val max_val]); ylim(m_lim); xlim(n_lim);
             subplot(2,3,2);
             imagesc(im2); title(sprintf('A2, cell%d', n_cell2)); 
-            axis equal tight; caxis([0 max_val]); ylim(m_lim); xlim(n_lim);
+            axis equal tight; caxis([min_val max_val]); ylim(m_lim); xlim(n_lim);
             subplot(2,3,3);
             imagesc(im_comb); title('Acomb'); 
-            axis equal tight; caxis([0 max_val]); ylim(m_lim); xlim(n_lim);
+            axis equal tight; caxis([min_val max_val]); ylim(m_lim); xlim(n_lim);
             subplot(2,3,4:6); hold on; 
             plot(tr_combn, 'k'); plot(tr1); plot(tr2); 
             legend('trcomb', 'tr1', 'tr2'); axis tight;
@@ -189,12 +223,12 @@ merged_cells2 = cat(1, merged_cells{:});
 
 if numel(merged_cells2)
     if apply_merge
-        if strcmpi(merge_method, 'Reject smaller snr')
+        if strcmpi(method, 'choose best snr')
             idx1 = and(strcmpi({merged_cells2.merge_status}, 'input'), ~[merged_cells2.keep_status]);
             cells_throw = [merged_cells2(idx1).n_cell];
             proc.idx_manual_bad = union(proc.idx_manual_bad, cells_throw);
             proc.idx_manual = setdiff(proc.idx_manual, proc.idx_manual_bad);
-        elseif strcmpi(merge_method, 'Combine and reject other')
+        else
             idx1 = strcmpi({merged_cells2.merge_status}, 'input');
             cells_throw = [merged_cells2(idx1).n_cell];
             proc.idx_manual_bad = union(proc.idx_manual_bad, cells_throw);
