@@ -7,6 +7,7 @@ app.r_valEditField.Value = num2str(app.est.r_values(app.current_cell_num));
 app.FiringstabilityEditField.Value = num2str(app.proc.firing_stab_vals(app.current_cell_num));
 app.PeaksaveEditField.Value = num2str(app.proc.peaks_ave(app.current_cell_num));
 app.StdnoiseEditField.Value = num2str(app.proc.noise(app.current_cell_num));
+app.SkewnessEditField.Value = num2str(app.proc.skewness(app.current_cell_num));
 % extract the zoomed cell and make it square axis
 current_A = reshape(full(app.est.A(:,app.current_cell_num)),app.est.dims(1),app.est.dims(2));
 imagesc(app.UIAxes_component, current_A);

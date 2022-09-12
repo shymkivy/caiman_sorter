@@ -36,6 +36,9 @@ function f_cs_evaluate_components(app)
         if app.CheckBoxFiringStability.Value
             app.proc.comp_accepted_core = (app.proc.firing_stab_vals>=app.EditFieldFiringStability.Value).*app.proc.comp_accepted_core;
         end
+        if app.CheckBoxSkewness.Value
+            app.proc.comp_accepted_core = (app.proc.skewness>=app.EditFieldSkewness.Value).*app.proc.comp_accepted_core;
+        end
         app.proc.comp_accepted_core = logical(app.proc.comp_accepted_core);
     end
 end

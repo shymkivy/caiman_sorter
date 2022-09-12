@@ -23,7 +23,10 @@ peak_params.peak_bin_sig_size = proc.peak_bin_sig_size;
 peak_params.fr = est.init_params_caiman.data.fr;
 
 A = est.A(:,comp_acc);
-trace = est.C(comp_acc,:) + est.YrA(comp_acc,:);
+C = est.C(comp_acc,:);
+trace = C + est.YrA(comp_acc,:);
+base1 = min(C,[], 2);
+
 
 AA = (A'*A);
 AA_lt = tril(AA,-1);
@@ -38,6 +41,7 @@ tr_merge = cell(num_cells_ov,1);
 
 num_cells_added = 0;
 merged_cells = cell(num_cells_ov,1);
+
 for n_cell = 1:num_cells_ov
     n_cell_acc1 = rows(n_cell);
     n_cell_acc2 = cols(n_cell);
@@ -48,19 +52,22 @@ for n_cell = 1:num_cells_ov
         n_cell1 = idx_lut(n_cell_acc1);
         n_cell2 = idx_lut(n_cell_acc2);
         
+        tr1_norm = norm(trace(n_cell_acc1,:)-base1(n_cell_acc1));
+        tr2_norm = norm(trace(n_cell_acc2,:)-base1(n_cell_acc2));
+        
         tr1 = trace(n_cell_acc1,:);
         tr2 = trace(n_cell_acc2,:);
         A1 = A(:,n_cell_acc1);
         A2 = A(:,n_cell_acc2);
         
         if strcmpi(method, 'weighted ave')
-            tr1_sum = sum(tr1);
-            tr2_sum = sum(tr2);
+            %tr1_sum = sum(tr1);
+            %tr2_sum = sum(tr2);
             A1_sum = full(sum(A1));
             A2_sum = full(sum(A2));
 
             tr_comb = (tr1*A1_sum + tr2*A2_sum)/(A1_sum+A2_sum);
-            A_comb = (A1*tr1_sum + A2*tr2_sum)/(tr1_sum+tr2_sum);
+            A_comb = (A1*tr1_norm + A2*tr2_norm)/(tr1_norm+tr2_norm);
             A_comb_norm = norm(A_comb);
 
             A_combn = A_comb/A_comb_norm;
@@ -172,6 +179,7 @@ for n_cell = 1:num_cells_ov
         
         % new proc params
         cell_out.noise = GetSn(tr_combn);
+        cell_out.skewness = skewness(tr_combn);
         cell_out.peaks_ave = f_cs_compute_peaks_ave(tr_combn, peak_params);
         cell_out.num_zeros = sum(tr_combn==0);
         cell_out.gAR1 = estimate_time_constant(tr_combn, 1, proc.noise(n_cell));

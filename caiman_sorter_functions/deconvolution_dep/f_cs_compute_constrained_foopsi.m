@@ -8,7 +8,7 @@ y = double(app.est.C(n_cell,:) + app.est.YrA(n_cell,:));
 
 app.proc.deconv.c_foopsi.S{n_cell} = sp';
 app.proc.deconv.c_foopsi.C{n_cell} = c';
-app.proc.deconv.c_foopsi.p{n_cell} = p;
+app.proc.deconv.c_foopsi.p{n_cell} = options.p;
 app.proc.deconv.c_foopsi.g{n_cell} = g;
 
 end

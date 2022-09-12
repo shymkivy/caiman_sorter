@@ -37,7 +37,11 @@ for n_cell = 1:proc.num_cells
 end
 
 %%  noise and time constants
-proc.noise = zeros(proc.num_cells,1);
+traces1 = est.YrA + est.C;
+
+proc.noise = GetSn(traces1);
+proc.skewness = skewness(traces1, [], 2);
+
 proc.gAR1 = zeros(proc.num_cells,1);
 proc.gAR2 = zeros(proc.num_cells,2);
 proc.tauAR1 = zeros(proc.num_cells,1);
@@ -45,11 +49,11 @@ proc.tauAR2 = zeros(proc.num_cells,2);
 
 dt = 1/double(ops.init_params_caiman.data.fr);
 
+
 for n_cell = 1:proc.num_cells
-    temp_cell = est.YrA(n_cell,:) + est.C(n_cell,:);
+    temp_cell = traces1(n_cell,:);
     %peak = max(temp_cell)-base;
-    proc.noise(n_cell) = GetSn(temp_cell);
-    
+
     proc.gAR1(n_cell) = estimate_time_constant(temp_cell, 1, proc.noise(n_cell));
     proc.gAR2(n_cell,:) = estimate_time_constant(temp_cell, 2, proc.noise(n_cell));
     

@@ -36,7 +36,11 @@ if add_disc
         est.contours = [est_good.contours; est_bad.contours];
         est.C = [est_good.C; est_bad.C];
         if iscell(est_bad.F_dff)
-            if strcmp(est.idx_components{1}, 'NoneType')
+            if strcmp(est_bad.F_dff, 'NoneType')
+                est.F_dff = [est_good.F_dff; zeros(size(est_bad.C))];
+            end
+        elseif ischar(est_bad.F_dff)
+            if strcmp(est_bad.F_dff, 'NoneType') || strcmp(est_bad.F_dff', 'NoneType')
                 est.F_dff = [est_good.F_dff; zeros(size(est_bad.C))];
             end
         else

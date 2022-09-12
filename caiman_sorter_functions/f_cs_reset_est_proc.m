@@ -35,6 +35,9 @@ proc.comp_accepted_core = proc.comp_accepted_core(1:num_cells_pre);
 proc.idx_components = proc.idx_components(proc.idx_components<=num_cells_pre);
 proc.idx_components_bad = proc.idx_components_bad(proc.idx_components_bad<=num_cells_pre);
 
+proc.idx_manual = [];
+proc.idx_manual_bad = [];
+
 if isfield(proc, 'devonv')
     proc.deconv.smooth_dfdt.S = proc.deconv.smooth_dfdt.S(1:num_cells_pre,:);
     proc.deconv.smooth_dfdt.S_std = proc.deconv.smooth_dfdt.S_std(1:num_cells_pre);

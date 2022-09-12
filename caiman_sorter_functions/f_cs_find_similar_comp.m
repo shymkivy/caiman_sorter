@@ -8,12 +8,6 @@ params.plot_stuff = 1;
 params.spac_thr = app.spatialcorrthershEditField.Value;
 params.temp_thr = app.tempcorrtheshEditField.Value;
 
-if app.UseacceptedcellsCheckBox.Value
-    params.comp_acc = app.proc.comp_accepted;
-else
-    params.comp_acc = true(app.proc.num_cells,1);
-end
-
 dc_params.use_manual_params = app.UsemanualtimeconstantsCheckBoxCfoopsi.Value;
 dc_params.p = str2double(app.ARmodelSwitchCfoopsi.Value);
 dc_params.manual_tau_rise = app.TauriseEditFieldCfoopsi.Value;
@@ -26,6 +20,12 @@ est = app.est;
 proc = app.proc;
 
 [est, proc] = f_cs_reset_est_proc(est, proc);
+
+if app.UseacceptedcellsCheckBox.Value
+    params.comp_acc = proc.comp_accepted;
+else
+    params.comp_acc = true(proc.num_cells,1);
+end
 
 [est, proc] = f_cs_find_similar_comp_core(est, proc, params);
 

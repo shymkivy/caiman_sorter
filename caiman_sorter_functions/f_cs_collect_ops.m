@@ -17,13 +17,14 @@ eval_params2.RejThrCNN =                app.EditFieldCNN.Value;
 eval_params2.RejThrRvalues =            app.EditFieldRvalues.Value;
 eval_params2.RejThrMinSigFrac =         app.EditFieldMinSigFrac.Value;
 eval_params2.FiringStability =          app.EditFieldFiringStability.Value;
+eval_params2.RejThrSkewness =           app.EditFieldSkewness.Value;
 eval_params2.EvalSNRcaiman =            app.CheckBoxSNRcaiman.Value;
 eval_params2.EvalSNR2 =                 app.CheckBoxSNR2.Value;
 eval_params2.EvalCNN =                  app.CheckBoxCNN.Value;
 eval_params2.EvalRvalues =              app.CheckBoxRvalues.Value;
 eval_params2.EvalMinSigFrac =           app.CheckBoxMinSigFrac.Value;
 eval_params2.EvalFiringStability =      app.CheckBoxFiringStability.Value;
-
+eval_params2.EvalSkewness =             app.CheckBoxSkewness.Value;
 %% deconvolution params
 % smooth df/dt
 deconv.smooth_dfdt.params.convolve_gaus =       app.ConvolvewithgaussiankernelCheckBoxSmoothdfdt.Value;
