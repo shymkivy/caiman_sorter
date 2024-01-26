@@ -99,9 +99,9 @@ for n_cell = 1:num_cells_ov
                 tr_combn = V(:,1)*S(1,1);
                 A_combn(A_mask) = U(:,1);
             elseif strcmpi(method, 'nmf')
-            [W,H] = nnmf(full_comb,1);
-            tr_combn = H*norm(W);
-            A_combn(A_mask) = W/norm(W);
+                [W,H] = nnmf(full_comb,1);
+                tr_combn = H*norm(W);
+                A_combn(A_mask) = W/norm(W);
             else
                 error('method %s is undefined', method)
             end
