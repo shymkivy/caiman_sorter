@@ -262,12 +262,14 @@ if numel(merged_cells2)
                     est.g(:,n_cell) = cell_data.g;
 
                     est.idx_components = [est.idx_components; n_cell];
+                    est.num_cells_mod = est.num_cells_mod + 1;
                     
                     proc.num_cells = proc.num_cells + 1;
                     
                     proc.peaks_ave(n_cell) = cell_data.peaks_ave;
                     proc.num_zeros(n_cell) = cell_data.num_zeros;
                     proc.noise(n_cell) = cell_data.noise;
+                    proc.skewness(n_cell) = cell_data.skewness;
                     proc.gAR1(n_cell) = cell_data.gAR1;
                     proc.gAR2(n_cell,:) = cell_data.gAR2;
                     proc.tauAR1(n_cell) = cell_data.tauAR1;

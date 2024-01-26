@@ -7,6 +7,10 @@ A_indices = h5read(file_loc,[dataset_path '/A/indices']) + 1; % python offset
 A_indptr = h5read(file_loc,[dataset_path '/A/indptr']);
 A_shape = h5read(file_loc,[dataset_path '/A/shape']);
 
+if ~exist('disc_offset', 'var')
+    disc_offset = 0;
+end
+
 % A = zeros(A_shape', 'single');
 % contours = cell(numel(A_indptr)-1,1);
 % for ii = 1:numel(A_indptr)-1         
@@ -63,114 +67,77 @@ est.g = h5read(file_loc,[dataset_path '/g']);
 est.idx_components = h5read(file_loc,[dataset_path '/idx_components']);
 est.idx_components_bad = h5read(file_loc,[dataset_path '/idx_components_bad']);
 
-if iscell(est.idx_components)
-    if strcmp(est.idx_components{1}, 'NoneType')
-        %no index assigned
-        if ~exist('disc_offset', 'var')
-            est.idx_components = 0:(A_shape(2)-1);
-            est.idx_components_bad = [];
-        else
-            est.idx_components = [];
-            est.idx_components_bad = (0:(A_shape(2)-1))+disc_offset;
-        end
+make_idx_good = if_check_empty(est.idx_components);
+make_idx_bad = if_check_empty(est.idx_components_bad);
 
-        error_log = {error_log; 'Components were not evaluated in caiman'};
+if make_idx_good
+    %no index assigned
+    if disc_offset
+        est.idx_components = [];
+        est.idx_components_bad = (1:A_shape(2))+disc_offset;
+    else
+        est.idx_components = 1:A_shape(2);
+        est.idx_components_bad = [];
     end
-elseif ischar(est.idx_components)
-    if strcmp(est.idx_components, 'NoneType')
-        %no index assigned
-        if ~exist('disc_offset', 'var')
-            est.idx_components = 0:(A_shape(2)-1);
-            est.idx_components_bad = [];
-        else
-            est.idx_components = [];
-            est.idx_components_bad = (0:(A_shape(2)-1))+disc_offset;
-        end
+    error_log = {error_log; 'Components were not evaluated in caiman'};
+elseif make_idx_bad && ~make_idx_good
+    %no index assigned
+    if disc_offset
+        est.idx_components_bad = (1:A_shape(2))+disc_offset;
+    else
+        est.idx_components_bad = [];
+    end
 
-        error_log = {error_log; 'Components were not evaluated in caiman'};
-    end
+    error_log = {error_log; 'Components were not evaluated in caiman'};
+else
+    est.idx_components = est.idx_components + 1; % python offset
+    est.idx_components_bad = est.idx_components_bad + 1; % python offset
 end
 
-if iscell(est.idx_components_bad)
-    if strcmp(est.idx_components_bad{1}, 'NoneType')
-        %no index assigned
-        if ~exist('disc_offset', 'var')
-            est.idx_components_bad = [];
-        else
-            est.idx_components_bad = (0:(A_shape(2)-1))+disc_offset;
-        end
-
-        error_log = {error_log; 'Components were not evaluated in caiman'};
-    end
-elseif ischar(est.idx_components_bad)
-    if strcmp(est.idx_components_bad, 'NoneType')
-        %no index assigned
-        if ~exist('disc_offset', 'var')
-            est.idx_components_bad = [];
-        else
-            est.idx_components_bad = (0:(A_shape(2)-1))+disc_offset;
-        end
-
-        error_log = {error_log; 'Components were not evaluated in caiman'};
-    end
+is_empty = if_check_empty(est.SNR_comp);
+if is_empty
+    est.SNR_comp = zeros(A_shape(2),1);
+    error_log = {error_log; 'SNR was not evaluated in caiman'};
 end
 
-est.idx_components = est.idx_components + 1; % python offset
-est.idx_components_bad = est.idx_components_bad + 1; % python offset
-
-if iscell(est.SNR_comp)
-    if strcmp(est.SNR_comp{1}, 'NoneType')
-        est.SNR_comp = zeros(A_shape(2),1);
-        error_log = {error_log; 'SNR was not evaluated in caiman'};
-    end
-elseif ischar(est.SNR_comp)
-    if strcmp(est.SNR_comp, 'NoneType')
-        est.SNR_comp = zeros(A_shape(2),1);
-        error_log = {error_log; 'SNR was not evaluated in caiman'};
-    end
-end
-
-if iscell(est.cnn_preds)
-    if strcmp(est.cnn_preds{1}, 'NoneType')
-        est.cnn_preds = zeros(A_shape(2),1);
-        error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
-    end
-elseif ischar(est.cnn_preds)
-    if strcmp(est.cnn_preds, 'NoneType')
-        est.cnn_preds = zeros(A_shape(2),1);
-        error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
-    end
-elseif isempty(est.cnn_preds)
+is_empty = if_check_empty(est.cnn_preds);
+if is_empty
     est.cnn_preds = zeros(A_shape(2),1);
     error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
 end
 
-if iscell(est.r_values)
-    if strcmp(est.r_values{1}, 'NoneType')
-        est.r_values = zeros(A_shape(2),1);
-        error_log = {error_log; 'R-values were not evaluated in caiman'};
-    end
-elseif ischar(est.r_values)
-    if strcmp(est.r_values, 'NoneType')
-        est.r_values = zeros(A_shape(2),1);
-        error_log = {error_log; 'R-values were not evaluated in caiman'};
-    end
+is_empty = if_check_empty(est.r_values);
+if is_empty
+    est.r_values = zeros(A_shape(2),1);
+    error_log = {error_log; 'R-values were not evaluated in caiman'};
 end
 
-if iscell(est.b)
-    if strcmp(est.b{1}, 'NoneType')
-        est.b = zeros(1,size(A,1));
-        est.f = zeros(size(est.C,2),1);
-        error_log = {error_log; 'b and f were not evaluated in caiman'};
-    end
-elseif ischar(est.b)
-    if strcmp(est.b, 'NoneType')
-        est.b = zeros(1,size(A,1));
-        est.f = zeros(size(est.C,2),1);
-        error_log = {error_log; 'b and f were not evaluated in caiman'};
-    end
+is_empty = if_check_empty(est.b);
+if is_empty
+    est.b = zeros(1,size(A,1));
+    est.f = zeros(size(est.C,2),1);
+    error_log = {error_log; 'b and f were not evaluated in caiman'};
 end
 
 est.error_log = error_log;
+
+end
+
+function is_empty = if_check_empty(var)
+
+is_empty = 0;
+if iscell(var)
+    if strcmp(var{1}, 'NoneType')
+        is_empty = 1;
+    end
+end
+if ischar(var)
+    if strcmp(var, 'NoneType')
+        is_empty = 1;
+    end
+end
+if isempty(var)
+    is_empty = 1;
+end
 
 end

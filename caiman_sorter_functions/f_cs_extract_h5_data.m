@@ -90,4 +90,5 @@ est.eval_params_caiman = eval_params;
 est.init_params_caiman = init_params;
 est.extraction_error_log = error_log;
 est.num_cells_original = size(est.C,1);
+est.num_cells_mod = est.num_cells_original;
 end
