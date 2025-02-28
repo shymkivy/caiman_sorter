@@ -35,17 +35,7 @@ if add_disc
         est.A = [est_good.A, est_bad.A];
         est.contours = [est_good.contours; est_bad.contours];
         est.C = [est_good.C; est_bad.C];
-        if iscell(est_bad.F_dff)
-            if strcmp(est_bad.F_dff, 'NoneType')
-                est.F_dff = [est_good.F_dff; zeros(size(est_bad.C))];
-            end
-        elseif ischar(est_bad.F_dff)
-            if strcmp(est_bad.F_dff, 'NoneType') || strcmp(est_bad.F_dff', 'NoneType')
-                est.F_dff = [est_good.F_dff; zeros(size(est_bad.C))];
-            end
-        else
-            est.F_dff = [est_good.F_dff; est_bad.F_dff];
-        end
+        est.F_dff = [est_good.F_dff; est_bad.F_dff];
         est.R = [est_good.R; est_bad.R];
         est.S = [est_good.S; est_bad.S];
         est.YrA = [est_good.YrA; est_bad.YrA];

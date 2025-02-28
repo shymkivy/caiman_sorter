@@ -52,8 +52,8 @@ for n_cell = 1:num_cells_ov
         n_cell1 = idx_lut(n_cell_acc1);
         n_cell2 = idx_lut(n_cell_acc2);
         
-        tr1_norm = norm(trace(n_cell_acc1,:)-base1(n_cell_acc1));
-        tr2_norm = norm(trace(n_cell_acc2,:)-base1(n_cell_acc2));
+        tr1_norm = double(norm(trace(n_cell_acc1,:)-base1(n_cell_acc1)));
+        tr2_norm = double(norm(trace(n_cell_acc2,:)-base1(n_cell_acc2)));
         
         tr1 = trace(n_cell_acc1,:);
         tr2 = trace(n_cell_acc2,:);
@@ -107,15 +107,17 @@ for n_cell = 1:num_cells_ov
             end
         end
         
-        A_merge{n_cell} = A_combn;
-        tr_merge{n_cell} = tr_combn;
-        
+        %A_merge{n_cell} = A_comb; % A_combn
+        %tr_merge{n_cell} = tr_comb; % tr_combn
+        A_merge{n_cell} = A_combn; % 
+        tr_merge{n_cell} = A_combn; %
+         
         if plot_stuff
-            im1 = reshape(full(A1), [256, 256]);
-            im2 = reshape(full(A2), [256, 256]);
-            im_comb = reshape(full(A_combn), [256, 256]);
+            im1 = reshape(full(A1), est.dims');
+            im2 = reshape(full(A2), est.dims');
+            im_comb = reshape(full(A_comb), est.dims');
             
-            all_vals = [A1, A2, A_combn];
+            all_vals = [A1, A2, A_comb];
             max_val = full(max(all_vals(:)));
             min_val = full(min(all_vals(:)));
             
@@ -127,13 +129,13 @@ for n_cell = 1:num_cells_ov
             figure; 
             subplot(2,3,1);
             imagesc(im1); title(sprintf('A1, cell%d', n_cell1)); 
-            axis equal tight; caxis([min_val max_val]); ylim(m_lim); xlim(n_lim);
+            axis equal tight; ylim(m_lim); xlim(n_lim); % caxis([min_val max_val]); 
             subplot(2,3,2);
             imagesc(im2); title(sprintf('A2, cell%d', n_cell2)); 
-            axis equal tight; caxis([min_val max_val]); ylim(m_lim); xlim(n_lim);
+            axis equal tight; ylim(m_lim); xlim(n_lim); %caxis([min_val max_val]); 
             subplot(2,3,3);
             imagesc(im_comb); title('Acomb'); 
-            axis equal tight; caxis([min_val max_val]); ylim(m_lim); xlim(n_lim);
+            axis equal tight; ylim(m_lim); xlim(n_lim); %caxis([min_val max_val]); 
             subplot(2,3,4:6); hold on; 
             plot(tr_combn, 'k'); plot(tr1); plot(tr2); 
             legend('trcomb', 'tr1', 'tr2'); axis tight;
@@ -161,7 +163,7 @@ for n_cell = 1:num_cells_ov
         cell_out = struct();
         cell_out.n_cell = num_comp_all + 1 + num_cells_added;
         cell_out.n_cell_merge = num_comp_all + 1 + num_cells_added;
-        cell_out.A = A_combn;
+        cell_out.A = A_comb; % combn
         cell_out.F_dff = zeros(1, numel(tr_combn));
         
         cell_out.SNR_comp = mean([merged_cells{n_cell}.SNR_comp]);
@@ -210,7 +212,7 @@ for n_cell = 1:num_cells_ov
         options.fudge_factor = dc_params.fudge_factor;
         options.p = dc_params.p;
         
-        [C, S] = f_cs_compute_constrained_foopsi_core(tr_combn, g, cell_out.noise, options);
+        [C, S] = f_cs_compute_constrained_foopsi_core(double(tr_combn), double(g), double(cell_out.noise), options);
         
         cell_out.C = C;
         cell_out.YrA = tr_combn - C';
@@ -221,6 +223,7 @@ for n_cell = 1:num_cells_ov
         cell_out.comp_accepted_core = 0;
         cell_out.comp_accepted = 1;
         
+        %numel(fieldnames(merged_cells{n_cell}))
         merged_cells{n_cell} = [merged_cells{n_cell}; cell_out];
 
         num_cells_added = num_cells_added + 1;

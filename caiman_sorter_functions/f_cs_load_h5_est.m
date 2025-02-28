@@ -44,15 +44,20 @@ est.contours = contours;
 
 % load C
 est.C = h5read(file_loc,[dataset_path '/C'])';
-est.F_dff = h5read(file_loc,[dataset_path '/F_dff'])';
-est.R = h5read(file_loc,[dataset_path '/R'])';
-est.S = h5read(file_loc,[dataset_path '/S'])';
-est.YrA = h5read(file_loc,[dataset_path '/YrA'])';
+sizC = size(est.C);
+
+fields1 = {'S', 'YrA', 'F_dff', 'R'};
+siz1 = sizC;
+[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, error_log);
 
 % comp evaluation
-est.SNR_comp = h5read(file_loc,[dataset_path '/SNR_comp']);
-est.cnn_preds = h5read(file_loc,[dataset_path '/cnn_preds']);
-est.r_values = h5read(file_loc,[dataset_path '/r_values']);
+siz1 = [sizC(1), 1];
+fields1 = {'SNR_comp', 'cnn_preds', 'r_values'};
+[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, error_log);
+
+siz1 = [2, sizC(1)];
+fields1 = {'g'};
+[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, error_log);
 
 % background
 est.sn = h5read(file_loc,[dataset_path '/sn']);
@@ -60,8 +65,6 @@ est.sn = h5read(file_loc,[dataset_path '/sn']);
 est.b = h5read(file_loc,[dataset_path '/b']);
 % temporal background
 est.f = h5read(file_loc,[dataset_path '/f']);
-
-est.g = h5read(file_loc,[dataset_path '/g']);
 
 % index of good and bad
 est.idx_components = h5read(file_loc,[dataset_path '/idx_components']);
@@ -94,23 +97,6 @@ else
     est.idx_components_bad = est.idx_components_bad + 1; % python offset
 end
 
-is_empty = if_check_empty(est.SNR_comp);
-if is_empty
-    est.SNR_comp = zeros(A_shape(2),1);
-    error_log = {error_log; 'SNR was not evaluated in caiman'};
-end
-
-is_empty = if_check_empty(est.cnn_preds);
-if is_empty
-    est.cnn_preds = zeros(A_shape(2),1);
-    error_log = {error_log; 'CNN predictions were not evaluated in caiman'};
-end
-
-is_empty = if_check_empty(est.r_values);
-if is_empty
-    est.r_values = zeros(A_shape(2),1);
-    error_log = {error_log; 'R-values were not evaluated in caiman'};
-end
 
 is_empty = if_check_empty(est.b);
 if is_empty
@@ -125,19 +111,37 @@ end
 
 function is_empty = if_check_empty(var)
 
-is_empty = 0;
-if iscell(var)
-    if strcmp(var{1}, 'NoneType')
+    is_empty = 0;
+    if iscell(var)
+        if strcmp(var{1}, 'NoneType')
+            is_empty = 1;
+        end
+    end
+    if ischar(var)
+        if strcmp(var, 'NoneType')
+            is_empty = 1;
+        end
+    end
+    if isempty(var)
         is_empty = 1;
     end
+
 end
-if ischar(var)
-    if strcmp(var, 'NoneType')
-        is_empty = 1;
+
+function [est, error_log] = if_copy_fields(est, fields_in, size_check, file_loc, dataset_path, error_log)
+
+for n_fl = 1:numel(fields_in)
+    fl = fields_in{n_fl};
+    temp1 = h5read(file_loc,[dataset_path '/' fl]);
+    if sum(size(temp1') == size_check) == 2
+        est.(fl) = temp1';
+    elseif sum(size(temp1) == size_check) == 2
+        est.(fl) = temp1;
+    else
+        est.(fl) = zeros(size_check);
+        error_log = [error_log; {sprintf('%s not evaluated in caiman', fl)}];
     end
 end
-if isempty(var)
-    is_empty = 1;
-end
+
 
 end

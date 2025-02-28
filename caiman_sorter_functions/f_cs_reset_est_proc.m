@@ -13,6 +13,7 @@ est.SNR_comp = est.SNR_comp(1:num_cells_pre);
 est.cnn_preds = est.cnn_preds(1:num_cells_pre);
 est.r_values = est.r_values(1:num_cells_pre);
 est.g = est.g(:,1:num_cells_pre);
+est.num_cells_mod = est.num_cells_original;
 est.idx_components = est.idx_components(est.idx_components<=num_cells_pre);
 est.idx_components_bad = est.idx_components_bad(est.idx_components_bad<=num_cells_pre);
 
@@ -21,6 +22,7 @@ proc.num_cells = num_cells_pre;
 proc.peaks_ave = proc.peaks_ave(1:num_cells_pre);
 proc.num_zeros = proc.num_zeros(1:num_cells_pre);
 proc.noise = proc.noise(1:num_cells_pre);
+proc.skewness = proc.skewness(1:num_cells_pre);
 proc.gAR1 = proc.gAR1(1:num_cells_pre);
 proc.gAR2 = proc.gAR2(1:num_cells_pre,:);
 proc.tauAR1 = proc.tauAR1(1:num_cells_pre);

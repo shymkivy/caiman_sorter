@@ -29,6 +29,25 @@ end
 
 [est, proc] = f_cs_find_similar_comp_core(est, proc, params);
 
+app.im_accepted_gobj = app.im_accepted_gobj(1:est.num_cells_original);
+app.im_rejected_gobj = app.im_rejected_gobj(1:est.num_cells_original);
+
+hold(app.UIAxes_Accepted, 'on');
+hold(app.UIAxes_Rejected, 'on');
+for n_cell = (est.num_cells_original+1):est.num_cells_mod
+    app.im_accepted_gobj = [app.im_accepted_gobj; gobjects(1,1)];
+    app.im_rejected_gobj = [app.im_rejected_gobj; gobjects(1,1)];
+    if proc.comp_accepted(n_cell)
+        app.im_accepted_gobj(n_cell) = plot(app.UIAxes_Accepted, est.contours{n_cell}(:,1), est.contours{n_cell}(:,2), 'LineWidth', 1, 'Visible', 1);
+        app.im_rejected_gobj(n_cell) = plot(app.UIAxes_Rejected, est.contours{n_cell}(:,1), est.contours{n_cell}(:,2), 'LineWidth', 1, 'Visible', 0);
+    else
+        app.im_accepted_gobj(n_cell) = plot(app.UIAxes_Accepted, est.contours{n_cell}(:,1), est.contours{n_cell}(:,2), 'LineWidth', 1, 'Visible', 0);
+        app.im_rejected_gobj(n_cell) = plot(app.UIAxes_Rejected, est.contours{n_cell}(:,1), est.contours{n_cell}(:,2), 'LineWidth', 1, 'Visible', 1);
+    end
+end
+hold(app.UIAxes_Accepted, 'off');
+hold(app.UIAxes_Rejected, 'off');
+
 app.est =  est;
 app.proc = proc;
 
