@@ -75,16 +75,16 @@ make_idx_bad = if_check_empty(est.idx_components_bad);
 
 if make_idx_good
     %no index assigned
+    est.idx_components = 1:A_shape(2);
     if disc_offset
-        est.idx_components = [];
         est.idx_components_bad = (1:A_shape(2))+disc_offset;
     else
-        est.idx_components = 1:A_shape(2);
         est.idx_components_bad = [];
     end
     error_log = {error_log; 'Components were not evaluated in caiman'};
 elseif make_idx_bad && ~make_idx_good
     %no index assigned
+    est.idx_components = est.idx_components + 1; % python offset
     if disc_offset
         est.idx_components_bad = (1:A_shape(2))+disc_offset;
     else

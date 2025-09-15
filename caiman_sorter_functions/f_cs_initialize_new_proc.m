@@ -10,7 +10,7 @@ proc.dims = est.dims;
 proc.idx_manual = [];
 proc.idx_manual_bad = [];
 proc.comp_accepted_core = false(proc.num_cells,1);
-proc.comp_accepted_core(proc.idx_components) = 1;
+proc.comp_accepted_core(proc.idx_components+1) = 1;
 proc.comp_accepted = proc.comp_accepted_core;
 
 %%  average of top peaks
