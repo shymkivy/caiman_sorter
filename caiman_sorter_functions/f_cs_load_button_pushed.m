@@ -11,7 +11,21 @@ if ~isempty(app.file_loc)
     
     % process h5 file if opened\
     if strcmpi(ext,'.hdf5') || strcmpi(ext,'.hdf') || strcmpi(ext,'.h5')
-        temp_dims = h5read(app.file_loc,'/estimates/dims');
+        file_info = h5info(app.file_loc);
+        
+        dims_idx = strcmpi('dims', {file_info.Datasets.Name});
+        if sum(dims_idx)
+            temp_dims = h5read(app.file_loc,'/dims');
+        else
+            est_idx = strcmpi('/estimates', {file_info.Groups.Name});
+            if sum(est_idx)
+                est_data = file_info.Groups(est_idx).Datasets;
+                if sum(strcmpi('dims', {est_data.Name}))
+                    temp_dims = h5read(app.file_loc,'/estimates/dims');
+                end
+            end
+        end
+        
         % import caiman settings
         app.est = f_cs_extract_h5_data(app.file_loc, temp_dims);
         app.est.dims = temp_dims;

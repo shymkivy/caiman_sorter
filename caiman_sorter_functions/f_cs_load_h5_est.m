@@ -2,6 +2,8 @@ function est = f_cs_load_h5_est(file_loc, dims, dataset_path, disc_offset)
 
 error_log = {};
 
+file_info = h5info(file_loc);
+
 A_data = h5read(file_loc,[dataset_path '/A/data']);
 A_indices = h5read(file_loc,[dataset_path '/A/indices']) + 1; % python offset
 A_indptr = h5read(file_loc,[dataset_path '/A/indptr']);
@@ -46,29 +48,33 @@ est.contours = contours;
 est.C = h5read(file_loc,[dataset_path '/C'])';
 sizC = size(est.C);
 
+est_idx = strcmpi('/estimates', {file_info.Groups.Name});
+est_keys = {file_info.Groups(est_idx).Datasets.Name};
+
 fields1 = {'S', 'YrA', 'F_dff', 'R'};
 siz1 = sizC;
-[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, error_log);
+[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, est_keys, error_log);
 
 % comp evaluation
 siz1 = [sizC(1), 1];
 fields1 = {'SNR_comp', 'cnn_preds', 'r_values'};
-[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, error_log);
+[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, est_keys, error_log);
 
 siz1 = [2, sizC(1)];
 fields1 = {'g'};
-[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, error_log);
+[est, error_log] = if_copy_fields(est, fields1, siz1, file_loc, dataset_path, est_keys, error_log);
 
-% background
-est.sn = h5read(file_loc,[dataset_path '/sn']);
-% spatial background
-est.b = h5read(file_loc,[dataset_path '/b']);
-% temporal background
-est.f = h5read(file_loc,[dataset_path '/f']);
-
-% index of good and bad
-est.idx_components = h5read(file_loc,[dataset_path '/idx_components']);
-est.idx_components_bad = h5read(file_loc,[dataset_path '/idx_components_bad']);
+% noise, spatial background, temporal background, index of good and bad
+fields1 = {'sn', 'b', 'f', 'idx_components', 'idx_components_bad'};
+for n_fl = 1:numel(fields1)
+    fl1 = fields1{n_fl};
+    if sum(strcmpi(fl1, est_keys))
+        est.(fl1) = h5read(file_loc,[dataset_path '/' fl1]);
+    else
+        est.(fl1) = [];
+        error_log = [error_log; {sprintf('%s does not exist in estimates', fl1)}];
+    end
+end
 
 make_idx_good = if_check_empty(est.idx_components);
 make_idx_bad = if_check_empty(est.idx_components_bad);
@@ -96,7 +102,6 @@ else
     est.idx_components = est.idx_components + 1; % python offset
     est.idx_components_bad = est.idx_components_bad + 1; % python offset
 end
-
 
 is_empty = if_check_empty(est.b);
 if is_empty
@@ -128,18 +133,23 @@ function is_empty = if_check_empty(var)
 
 end
 
-function [est, error_log] = if_copy_fields(est, fields_in, size_check, file_loc, dataset_path, error_log)
+function [est, error_log] = if_copy_fields(est, fields_in, size_check, file_loc, dataset_path, fields_available, error_log)
 
 for n_fl = 1:numel(fields_in)
     fl = fields_in{n_fl};
-    temp1 = h5read(file_loc,[dataset_path '/' fl]);
-    if sum(size(temp1') == size_check) == 2
-        est.(fl) = temp1';
-    elseif sum(size(temp1) == size_check) == 2
-        est.(fl) = temp1;
+    if sum(strcmpi(fields_available, fl))
+        temp1 = h5read(file_loc,[dataset_path '/' fl]);
+        if sum(size(temp1') == size_check) == 2
+            est.(fl) = temp1';
+        elseif sum(size(temp1) == size_check) == 2
+            est.(fl) = temp1;
+        else
+            est.(fl) = zeros(size_check);
+            error_log = [error_log; {sprintf('%s not evaluated in caiman, size mismatch', fl)}];
+        end
     else
         est.(fl) = zeros(size_check);
-        error_log = [error_log; {sprintf('%s not evaluated in caiman', fl)}];
+        error_log = [error_log; {sprintf('%s does not exist', fl)}];
     end
 end
 
