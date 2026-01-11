@@ -37,6 +37,20 @@ contours = cell(numel(A_indptr)-1,1);
 for ii = 1:numel(A_indptr)-1 
     temp_indices = A_indices(A_indptr(ii)+1:A_indptr(ii+1));
     [y_temp, x_temp] = ind2sub(dims, temp_indices);
+    if numel(unique(x_temp)) <= 1       % in case roi too small extend boundary so does not break
+        x_temp2 = [x_temp-1; x_temp; x_temp+1];
+        y_temp2 = [y_temp; y_temp; y_temp];
+        idx1 = and(x_temp2 >= 1, x_temp2 < dims(2));
+        x_temp = x_temp2(idx1);
+        y_temp = y_temp2(idx1);
+    end
+    if numel(unique(y_temp)) <= 1
+        x_temp2 = [x_temp; x_temp; x_temp];
+        y_temp2 = [y_temp-1 ; y_temp; y_temp+1];
+        idx1 = and(y_temp2 >= 1, y_temp2 < dims(1));
+        x_temp = x_temp2(idx1);
+        y_temp = y_temp2(idx1);
+    end
     indx_temp = boundary(x_temp, y_temp);
     contours{ii} = [x_temp(indx_temp),y_temp(indx_temp)];
 end
