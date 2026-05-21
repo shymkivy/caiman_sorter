@@ -256,7 +256,11 @@ if numel(merged_cells2)
                     est.contours(n_cell) = cell_data.contours;
                     est.C(n_cell,:) = cell_data.C;
                     est.F_dff(n_cell,:) = cell_data.F_dff;
-                    est.R(n_cell,:) = cell_data.R;
+                    % est.R is a legacy alias of YrA; if the loaded est
+                    % omits it (older Python output), just skip.
+                    if isfield(est, 'R')
+                        est.R(n_cell,:) = cell_data.R;
+                    end
                     est.S(n_cell,:) = cell_data.S;
                     est.YrA(n_cell,:) = cell_data.YrA;
                     est.SNR_comp(n_cell) = cell_data.SNR_comp;

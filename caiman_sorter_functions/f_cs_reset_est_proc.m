@@ -6,7 +6,11 @@ est.A = est.A(:,1:num_cells_pre);
 est.contours = est.contours(1:num_cells_pre);
 est.C = est.C(1:num_cells_pre,:);
 est.F_dff = est.F_dff(1:num_cells_pre,:);
-est.R = est.R(1:num_cells_pre,:);
+% est.R is a legacy alias of YrA — some files (e.g. older Python sorter
+% output) may not include it. Skip silently when absent.
+if isfield(est, 'R')
+    est.R = est.R(1:num_cells_pre,:);
+end
 est.S = est.S(1:num_cells_pre,:);
 est.YrA = est.YrA(1:num_cells_pre,:);
 est.SNR_comp = est.SNR_comp(1:num_cells_pre);

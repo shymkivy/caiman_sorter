@@ -4,7 +4,18 @@ ops = app.ops;
 
 if isfield(ops, 'SwitchCaimanEvaluate')
     try
-        app.SwitchCaimanEvaluate.Value = ops.SwitchCaimanEvaluate;
+        % The toggle dropdown only accepts the two exact strings 'Caiman evaluate'
+        % or 'Reject threshhold' — anything else throws. Normalize case-/spell-
+        % variations from other tools (e.g. Python sorter's 'CaImAn evaluate')
+        % to the canonical value before assigning.
+        v = lower(ops.SwitchCaimanEvaluate);
+        if contains(v, 'caiman')
+            app.SwitchCaimanEvaluate.Value = 'Caiman evaluate';
+        elseif contains(v, 'reject') || contains(v, 'thresh')
+            app.SwitchCaimanEvaluate.Value = 'Reject threshhold';
+        else
+            app.SwitchCaimanEvaluate.Value = ops.SwitchCaimanEvaluate; % let it error
+        end
         f_cs_FlipSwitchCaimanLight(app);
     catch
         f_cs_update_log(app, 'Unable to set SwitchCaimanEvaluate');

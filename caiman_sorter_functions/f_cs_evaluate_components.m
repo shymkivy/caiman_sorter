@@ -1,5 +1,6 @@
 function f_cs_evaluate_components(app)
-    if strcmp(app.SwitchCaimanEvaluate.Value, 'Caiman evaluate')
+    % strcmpi: tolerate case variations from other tools (e.g. 'CaImAn evaluate').
+    if strcmpi(app.SwitchCaimanEvaluate.Value, 'Caiman evaluate')
         % find good above thresh (from caiman python)
         idx_comp_r = find(app.est.r_values >= app.RvalthreshSpinner.Value);
         idx_comp_raw = find(app.est.SNR_comp > app.SNRthreshSpinner.Value);
@@ -16,7 +17,7 @@ function f_cs_evaluate_components(app)
 
         app.proc.comp_accepted_core = false(app.proc.num_cells,1);
         app.proc.comp_accepted_core(idx_comp) = 1;
-    elseif strcmp(app.SwitchCaimanEvaluate.Value, 'Reject threshhold')
+    elseif strcmpi(app.SwitchCaimanEvaluate.Value, 'Reject threshhold')
         app.proc.comp_accepted_core = true(size(app.est.C,1),1);
         if app.CheckBoxSNRcaiman.Value
             app.proc.comp_accepted_core = (app.est.SNR_comp>=app.EditFieldSNRcaiman.Value).*app.proc.comp_accepted_core;
