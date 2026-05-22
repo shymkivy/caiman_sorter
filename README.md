@@ -2,7 +2,7 @@
 
 MATLAB GUI to manually curate cells extracted by [CaImAn](https://github.com/flatironinstitute/CaImAn) / OnACID. Loads a CaImAn HDF5 (`*_results_cnmf.hdf5`) or a previously saved sort (`*_sort.mat`), lets you accept/reject components, tune evaluation thresholds, merge duplicates, and run deconvolution on the surviving cells.
 
-> **A Python port is also available.** If you prefer Python or want a cross-platform install without a MATLAB license, see **[shymkivy/caiman_sorter_py](https://github.com/shymkivy/caiman_sorter_py)**. The two sorters read each other's `.mat` and `.h5` sort files interchangeably.
+> **A Python port is also available: [shymkivy/caiman_sorter_py](https://github.com/shymkivy/caiman_sorter_py).** The two sorters read each other's `.mat` and `.h5` sort files interchangeably.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ The "constrained foopsi" tab exposes a solver dropdown:
 |---|---|---|
 | **`oasis`** | none (vendored) | Fast, no install needed. Default on systems without CVX / Optimization Toolbox. |
 | **`cvx`** | [CVX](http://cvxr.com/cvx/download/) | Highest quality, slowest. |
-| **`dual`** | Optimization Toolbox | Built-in fallback when you have a MATLAB toolbox license but no CVX. |
+| **`dual`** | Optimization Toolbox | Built-in fallback (uses `fmincon`). |
 
 Items the dropdown labels `(not installed)` are still selectable — the backend warns and falls back to whichever solver is available. The **Fudge factor** field (default 0.99) shrinks the AR poles to compensate for time-constant estimation bias, and now propagates into all three solvers (including OASIS).
 
