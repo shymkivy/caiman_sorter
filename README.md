@@ -32,5 +32,5 @@ Each method has its own tab.
 Upstream repos:
 
 - constrained foopsi/oasis — [zhoupc/OASIS_matlab](https://github.com/zhoupc/OASIS_matlab)
-- cvx / dual — [CaImAn-MATLAB](https://github.com/flatironinstitute/CaImAn-MATLAB/tree/master/deconvolution) `constrained_foopsi.m` stack, vendored in `deconvolution_dep/`
-- MCMC — Eftychios Pnevmatikakis' code, vendored from [flatironinstitute/CaImAn-MATLAB](https://github.com/flatironinstitute/CaImAn-MATLAB/tree/master/deconvolution/MCMC) (`deconvolution_dep/MCMC/`)
+- cvx / dual — [CaImAn-MATLAB](https://github.com/flatironinstitute/CaImAn-MATLAB/tree/master/deconvolution) `constrained_foopsi.m` stack (`deconvolution_dep/`)
+- MCMC — Eftychios Pnevmatikakis' code, from [flatironinstitute/CaImAn-MATLAB](https://github.com/flatironinstitute/CaImAn-MATLAB/tree/master/deconvolution/MCMC) (`deconvolution_dep/MCMC/`)
