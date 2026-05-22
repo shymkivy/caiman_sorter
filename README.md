@@ -21,12 +21,16 @@ MATLAB GUI to manually curate cells extracted by [CaImAn](https://github.com/fla
 
 ## Deconvolution
 
-Each method has its own tab. The "constrained foopsi" tab exposes a solver dropdown — the three rows below correspond to that dropdown.
+Each method has its own tab.
 
 | Method | Dependencies | Notes |
 |---|---|---|
 | **Smooth dF/dt** | none | Gaussian-smoothed first-difference of `C + YrA`. Fast, no model. |
-| **Constrained foopsi — `oasis`** | none — vendored from [OASIS_matlab](https://github.com/zhoupc/OASIS_matlab) (Pengcheng Zhou) | Fast. |
-| **Constrained foopsi — `cvx`** | [CVX](http://cvxr.com/cvx/download/) — uses the vendored CaImAn-MATLAB `constrained_foopsi.m` stack | Highest quality, slowest. |
-| **Constrained foopsi — `dual`** | Optimization Toolbox — same vendored stack as `cvx`, with `fmincon` instead | Built-in fallback. |
-| **MCMC** | [CVX](http://cvxr.com/cvx/download/) — Eftychios Pnevmatikakis' code, vendored in `deconvolution_dep/MCMC/` | Bayesian sampling-based. |
+| **Constrained foopsi** | `constrained foopsi/oasis` — fast · `cvx` (install [CVX](http://cvxr.com/cvx/download/)) — highest quality, slowest · `dual` (Optimization Toolbox) — built-in fallback via `fmincon` | Noise-constrained sparse deconvolution. |
+| **MCMC** | install [CVX](http://cvxr.com/cvx/download/) | Bayesian sampling-based. |
+
+Upstream repos:
+
+- constrained foopsi/oasis — [zhoupc/OASIS_matlab](https://github.com/zhoupc/OASIS_matlab)
+- cvx / dual — [CaImAn-MATLAB](https://github.com/flatironinstitute/CaImAn-MATLAB/tree/master/deconvolution) `constrained_foopsi.m` stack, vendored in `deconvolution_dep/`
+- MCMC — Eftychios Pnevmatikakis' code, vendored from [flatironinstitute/CaImAn-MATLAB](https://github.com/flatironinstitute/CaImAn-MATLAB/tree/master/deconvolution/MCMC) (`deconvolution_dep/MCMC/`)
