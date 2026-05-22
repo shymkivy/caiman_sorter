@@ -2,8 +2,10 @@ function f_cs_button_down(app, src, fig_type)
     % get coordinates of mouse click and type of click
     info = get(src);
     coord = round(info.Parent.CurrentPoint(1,1:2));
-    coord1 = min(max(coord(1), 0), double(app.proc.dims(2)));
-    coord2 = min(max(coord(2), 0), double(app.proc.dims(1)));
+    % MATLAB indices are 1-based; a click on the axis border can give 0,
+    % which would crash sub2ind. Clamp to [1, dims].
+    coord1 = min(max(coord(1), 1), double(app.proc.dims(2)));
+    coord2 = min(max(coord(2), 1), double(app.proc.dims(1)));
     indx_current =  sub2ind(app.proc.dims', coord2, coord1);
     selection_type = app.UIFigure.SelectionType;
     app.last_cell_num = app.current_cell_num;
@@ -50,6 +52,7 @@ function f_cs_button_down(app, src, fig_type)
     f_cs_update_idx_components(app);
     %f_cs_compute_background_im(app);
     f_cs_update_image_plots(app);
+    f_cs_rebuild_contours(app);   % redraw bin-grouped contour lines from current state
     f_cs_update_curr_cell_info(app);
 end
 
@@ -64,16 +67,11 @@ function f_manual_remove_comp(app)
 end
 
 function f_manual_add_contour(app)
-    if ~strcmp(app.PlotContoursButtonGroup.SelectedObject.Text,'None')
-        app.im_accepted_gobj(app.current_cell_num).Visible = 1;
-        app.im_rejected_gobj(app.current_cell_num).Visible = 0;
-    end
+    % Kept as a thin wrapper so any .mlapp callback that still references
+    % it doesn't break. Contour redraw now flows through rebuild_contours.
+    f_cs_rebuild_contours(app);
 end
 
 function f_manual_remove_contour(app)
-    % background countours with clicked on fig (faster than set_contours for this purpose)
-    if ~strcmp(app.PlotContoursButtonGroup.SelectedObject.Text,'None')
-        app.im_accepted_gobj(app.current_cell_num).Visible = 0;
-        app.im_rejected_gobj(app.current_cell_num).Visible = 1;
-    end
+    f_cs_rebuild_contours(app);
 end

@@ -92,7 +92,7 @@ if ~optimize_b   %% don't optimize the baseline b
         RSS = res' * res;
         
         % update g
-        if and(optimize_g, ~g_converged);
+        if and(optimize_g, ~g_converged)
             g0 = g;
             [solution, active_set, g, spks] = update_g(y, g, spks,smin);
             if abs(g-g0)/g0 < 1e-3 % g is converged
@@ -138,7 +138,7 @@ else
             b = mean(y-solution);
             
             % update b and g
-            if and(optimize_g, ~g_converged);
+            if and(optimize_g, ~g_converged)
                 g0 = g;
                 [solution, active_set, g, spks] = update_g(y-b, active_set,lam);
                 if abs(g-g0)/g0 < 1e-4;

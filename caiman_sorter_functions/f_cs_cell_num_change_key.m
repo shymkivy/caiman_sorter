@@ -9,7 +9,13 @@ if app.PressupdownkeytochangecellnumButton.Value
     elseif strcmpi(app.CellcategoryButtonGroup.SelectedObject.Text, 'All')
         cells_list = (1:app.proc.num_cells)';
     end
-    
+
+    % Filter may be empty (e.g. zero accepted cells); current_cell_num = []
+    % would then propagate to the spinner and throw.
+    if isempty(cells_list)
+        return;
+    end
+
     if strcmp(event.Key, 'uparrow')
         cells_list2 = cells_list > app.current_cell_num;
         if sum(cells_list2)

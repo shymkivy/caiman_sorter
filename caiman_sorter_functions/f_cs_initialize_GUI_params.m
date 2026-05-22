@@ -6,7 +6,11 @@ app.num_frames = size(app.est.C,2);
 app.idx_components_all = (1:app.num_cells)';
 app.current_cell_num = 1;
 app.bkg_comp_weights = mean(app.est.C,2);
-app.bkg_bgkcomp = reshape((mean(app.est.f)*app.est.b)',app.est.dims(1),app.est.dims(2));
+% MATLAB-internal: b is (n_bg, n_pixels), f is (n_frames, n_bg) (i.e.
+% transposed relative to CaImAn-Python's in-memory shapes). The formula
+% below works for any num_bg: mean(f) collapses dim 1 to (1, n_bg), then
+% * b gives (1, n_pixels), transpose -> (n_pixels, 1), reshape to FOV.
+app.bkg_bgkcomp = reshape((mean(app.est.f)*app.est.b)', app.est.dims(1), app.est.dims(2));
 app.DataframeratefpsEditField.Value = double(app.est.init_params_caiman.data.fr);
 
 % process caiman SNR vals to make sure there are no inf 

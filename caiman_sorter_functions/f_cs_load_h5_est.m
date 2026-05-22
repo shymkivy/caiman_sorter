@@ -32,31 +32,9 @@ for ii = 1:numel(A_indptr)-1
 end
 A = sparse(double(A_indices), cell_coeffs, double(A_data), double(A_shape(1)), double(A_shape(2)));
 
-% get concours for plots
-contours = cell(numel(A_indptr)-1,1);
-for ii = 1:numel(A_indptr)-1 
-    temp_indices = A_indices(A_indptr(ii)+1:A_indptr(ii+1));
-    [y_temp, x_temp] = ind2sub(dims, temp_indices);
-    if numel(unique(x_temp)) <= 1       % in case roi too small extend boundary so does not break
-        x_temp2 = [x_temp-1; x_temp; x_temp+1];
-        y_temp2 = [y_temp; y_temp; y_temp];
-        idx1 = and(x_temp2 >= 1, x_temp2 < dims(2));
-        x_temp = x_temp2(idx1);
-        y_temp = y_temp2(idx1);
-    end
-    if numel(unique(y_temp)) <= 1
-        x_temp2 = [x_temp; x_temp; x_temp];
-        y_temp2 = [y_temp-1 ; y_temp; y_temp+1];
-        idx1 = and(y_temp2 >= 1, y_temp2 < dims(1));
-        x_temp = x_temp2(idx1);
-        y_temp = y_temp2(idx1);
-    end
-    indx_temp = boundary(x_temp, y_temp);
-    contours{ii} = [x_temp(indx_temp),y_temp(indx_temp)];
-end
-
+% Per-cell contours for plotting — computed from the sparse A.
 est.A = A;
-est.contours = contours;
+est.contours = f_cs_compute_contours_from_A(A, dims);
 
 % load C
 est.C = h5read(file_loc,[dataset_path '/C'])';
@@ -93,35 +71,41 @@ end
 make_idx_good = if_check_empty(est.idx_components);
 make_idx_bad = if_check_empty(est.idx_components_bad);
 
+% NB: returned indices are in the COMBINED-pile frame — `+1` is the
+% Python→MATLAB 1-based shift, `+disc_offset` shifts the discarded pile
+% past the good pile so `f_cs_extract_h5_data.m` can use them as-is.
 if make_idx_good
     %no index assigned
-    est.idx_components = 1:A_shape(2);
+    est.idx_components = (1:A_shape(2)) + disc_offset;
     if disc_offset
         est.idx_components_bad = (1:A_shape(2))+disc_offset;
     else
         est.idx_components_bad = [];
     end
-    error_log = {error_log; 'Components were not evaluated in caiman'};
+    error_log = [error_log; {'Components were not evaluated in caiman'}];
 elseif make_idx_bad && ~make_idx_good
     %no index assigned
-    est.idx_components = est.idx_components + 1; % python offset
+    est.idx_components = est.idx_components + 1 + disc_offset; % python offset + pile shift
     if disc_offset
         est.idx_components_bad = (1:A_shape(2))+disc_offset;
     else
         est.idx_components_bad = [];
     end
 
-    error_log = {error_log; 'Components were not evaluated in caiman'};
+    error_log = [error_log; {'Components were not evaluated in caiman'}];
 else
-    est.idx_components = est.idx_components + 1; % python offset
-    est.idx_components_bad = est.idx_components_bad + 1; % python offset
+    est.idx_components     = est.idx_components     + 1 + disc_offset; % python offset + pile shift
+    est.idx_components_bad = est.idx_components_bad + 1 + disc_offset;
 end
 
 is_empty = if_check_empty(est.b);
 if is_empty
-    est.b = zeros(1,size(A,1));
-    est.f = zeros(size(est.C,2),1);
-    error_log = {error_log; 'b and f were not evaluated in caiman'};
+    % MATLAB-internal: b is (n_bg, n_pixels), f is (n_frames, n_bg) —
+    % transposed relative to CaImAn-Python's shapes. The bkg formula in
+    % f_cs_initialize_GUI_params.m relies on these orientations.
+    est.b = zeros(1, size(A,1));
+    est.f = zeros(size(est.C,2), 1);
+    error_log = [error_log; {'b and f were not evaluated in caiman'}];
 end
 
 est.error_log = error_log;
@@ -129,22 +113,22 @@ est.error_log = error_log;
 end
 
 function is_empty = if_check_empty(var)
-
+    % Check isempty FIRST, then index — otherwise `var{1}` on an empty
+    % cell throws before the empty branch fires.
     is_empty = 0;
+    if isempty(var)
+        is_empty = 1;
+        return;
+    end
     if iscell(var)
         if strcmp(var{1}, 'NoneType')
             is_empty = 1;
         end
-    end
-    if ischar(var)
+    elseif ischar(var)
         if strcmp(var, 'NoneType')
             is_empty = 1;
         end
     end
-    if isempty(var)
-        is_empty = 1;
-    end
-
 end
 
 function [est, error_log] = if_copy_fields(est, fields_in, size_check, file_loc, dataset_path, fields_available, error_log)

@@ -11,6 +11,10 @@ comp_acc = params.comp_acc;
 idx_lut = find(comp_acc);
 num_comp = sum(comp_acc);
 
+% Use the canonical current cell count from est.C (not numel(comp_acc) — a
+% caller passing a filtered/sub-length mask would otherwise pick merge-slot
+% indices that collide with existing cells).
+n_cells_current = size(est.C, 1);
 num_comp_all = numel(comp_acc);
 dims = est.dims;
 
@@ -109,8 +113,8 @@ for n_cell = 1:num_cells_ov
         
         %A_merge{n_cell} = A_comb; % A_combn
         %tr_merge{n_cell} = tr_comb; % tr_combn
-        A_merge{n_cell} = A_combn; % 
-        tr_merge{n_cell} = A_combn; %
+        A_merge{n_cell} = A_combn; %
+        tr_merge{n_cell} = tr_combn; % was A_combn — copy/paste bug
          
         if plot_stuff
             im1 = reshape(full(A1), est.dims');
@@ -152,7 +156,7 @@ for n_cell = 1:num_cells_ov
         pre_merge_data = cell(2,1);
         for n_cell_idx = 1:2
             pre_merge_data{n_cell_idx} = f_cs_gather_est_cell_data(est, proc, keep_throw_cell(n_cell_idx));
-            pre_merge_data{n_cell_idx}.n_cell_merge = num_comp_all + 1 + num_cells_added;
+            pre_merge_data{n_cell_idx}.n_cell_merge = n_cells_current + 1 + num_cells_added;
             pre_merge_data{n_cell_idx}.merge_status = 'input';
         end
         pre_merge_data{1}.keep_status = 1;
@@ -161,8 +165,8 @@ for n_cell = 1:num_cells_ov
         
         % some new est
         cell_out = struct();
-        cell_out.n_cell = num_comp_all + 1 + num_cells_added;
-        cell_out.n_cell_merge = num_comp_all + 1 + num_cells_added;
+        cell_out.n_cell = n_cells_current + 1 + num_cells_added;
+        cell_out.n_cell_merge = n_cells_current + 1 + num_cells_added;
         cell_out.A = A_comb; % combn
         cell_out.F_dff = zeros(1, numel(tr_combn));
         
@@ -211,7 +215,10 @@ for n_cell = 1:num_cells_ov
         cell_out.g = g;
         options.fudge_factor = dc_params.fudge_factor;
         options.p = dc_params.p;
-        
+        if isfield(dc_params, 'method') && ~isempty(dc_params.method)
+            options.method = dc_params.method;   % carry dropdown choice into merge deconv
+        end
+
         [C, S] = f_cs_compute_constrained_foopsi_core(double(tr_combn), double(g), double(cell_out.noise), options);
         
         cell_out.C = C;

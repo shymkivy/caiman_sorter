@@ -1,4 +1,9 @@
 function sn = GetSn(Y, range_ff, method)
+% NOTE: a near-identical copy lives at deconvolution_dep/functions/GetSn.m.
+% Which one MATLAB resolves to depends on path order — keep both in sync
+% if you patch either one. The deconv-dep copy has a few extra commented-
+% out plot lines; functional bodies are identical.
+
 %% Estimate noise standard deviation
 
 %% inputs:

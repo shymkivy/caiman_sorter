@@ -85,6 +85,11 @@ else
     for m=1:maxIter
         b = mean(y-solution);
         if  optimize_g     % update g
+            % upstream 0a1251f (2018-10): no active set → nothing to refine,
+            % avoid indexing an empty struct further down in update_g.
+            if size(active_set, 1) == 0
+                break;
+            end
             g0 = g;
             [solution, active_set, g, spks] = update_g(y-b, active_set,lam);
             if abs(g-g0)/g0 < 1e-3  % g is converged
@@ -130,7 +135,7 @@ g = fminbnd(@rss_g, 0, 1);
 yp = y - lam*(1-g);
 for m=1:len_active_set
     tmp_h = exp(log(g)*(0:maxl)');   % response kernel
-    tmp_hh = cumsum(h.*h);        % hh(k) = h(1:k)'*h(1:k)
+    tmp_hh = cumsum(tmp_h.*tmp_h);    % hh(k) = h(1:k)'*h(1:k)  (was `h.*h` — typo, `h` is nested-scope only)
     li = active_set(m, 4);
     ti = active_set(m, 3);
     idx = ti:(ti+li-1);

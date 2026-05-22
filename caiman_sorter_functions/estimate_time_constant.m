@@ -1,4 +1,8 @@
 function g = estimate_time_constant(y, p, sn, lags, fudge_factor)
+% NOTE: identical copy at deconvolution_dep/functions/estimate_time_constant.m.
+% MATLAB resolves whichever the path encounters first — keep both in
+% sync if you patch either one.
+
 %% Estimate noise standard deviation and AR coefficients if they are not present
 
 %% inputs:

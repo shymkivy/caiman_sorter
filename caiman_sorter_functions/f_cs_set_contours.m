@@ -33,35 +33,32 @@ function f_cs_set_contours(app)
 
 
     c_lim = app.curr_contour_params.c_lim;
-    visible_set = app.curr_contour_params.visible_set;
 
     app.ContourMinEditField.Value = c_lim(1);
     app.ContourMaxEditField.Value = c_lim(2);
 
-
-    % crop if goes beyond lim
-    contour_mag = max(app.curr_contour_params.contour_mag, c_lim(1));
-    contour_mag = min(contour_mag, c_lim(2));
-
-    % create color map
-    color_map = jet(round(app.contour_resolution*c_lim(2)) - round(app.contour_resolution*c_lim(1))+1); 
-    color_index = round(app.contour_resolution*c_lim(1)):round(app.contour_resolution*c_lim(2));
-    imagesc(app.UIAxesColorPallet, color_index/app.contour_resolution, 1, reshape(color_map,1,[],3));
+    % Palette display (small colorbar widget) — sample finely so the
+    % displayed gradient stays smooth regardless of K.
+    palette_resolution = app.contour_resolution;
+    palette_map = jet(round(palette_resolution*c_lim(2)) ...
+                      - round(palette_resolution*c_lim(1)) + 1);
+    palette_index = round(palette_resolution*c_lim(1)) ...
+                    : round(palette_resolution*c_lim(2));
+    imagesc(app.UIAxesColorPallet, palette_index/palette_resolution, 1, ...
+            reshape(palette_map, 1, [], 3));
     axis(app.UIAxesColorPallet, 'tight');
 
-    % update colors
-    for n_cell = 1:app.proc.num_cells
-        if app.proc.comp_accepted(n_cell)
-            app.im_accepted_gobj(n_cell).Visible = visible_set;
-            app.im_accepted_gobj(n_cell).Color = color_map(round(app.contour_resolution*contour_mag(n_cell)) == color_index,:); 
-            app.im_rejected_gobj(n_cell).Visible = 0;
-
-        else
-            app.im_accepted_gobj(n_cell).Visible = 0;
-            app.im_rejected_gobj(n_cell).Visible = visible_set;
-            app.im_rejected_gobj(n_cell).Color = color_map(round(app.contour_resolution*contour_mag(n_cell)) == color_index,:); 
-        end
-
+    % Set the per-bin colors on the K Line2Ds. K is the length of the
+    % gobject arrays (created by f_cs_initialize_contours; currently 32).
+    % All cells whose metric value falls in bin k get drawn with bin_colors(k).
+    K = numel(app.im_accepted_gobj);
+    bin_colors = jet(K);
+    for k = 1:K
+        app.im_accepted_gobj(k).Color = bin_colors(k, :);
+        app.im_rejected_gobj(k).Color = bin_colors(k, :);
     end
+
+    % Rebuild XData/YData per bin based on current contour_mag / accepted.
+    f_cs_rebuild_contours(app);
 
 end

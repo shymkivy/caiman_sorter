@@ -42,14 +42,15 @@ if add_disc
             est.SNR_comp = [est_good.SNR_comp; est_bad.SNR_comp];
             est.cnn_preds = [est_good.cnn_preds; est_bad.cnn_preds];
             est.r_values = [est_good.r_values; est_bad.r_values];
-            est.SNR_comp = [est_good.SNR_comp; est_bad.SNR_comp];
+            % (duplicate `est.SNR_comp = ...` removed — copy-paste leftover)
             est.sn = est_good.sn;
             est.b = est_good.b;
             est.f = est_good.f;
             est.g = [est_good.g, est_bad.g];
             est.idx_components = est_good.idx_components;
             est.idx_components_bad = est_bad.idx_components_bad;
-            error_log = [est_good.error_log; est_bad.error_log];
+            est.error_log = [est_good.error_log; est_bad.error_log];
+            error_log = est.error_log;
         else
             est = est_good;
         end

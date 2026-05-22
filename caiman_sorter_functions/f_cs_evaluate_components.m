@@ -1,17 +1,21 @@
 function f_cs_evaluate_components(app)
     % strcmpi: tolerate case variations from other tools (e.g. 'CaImAn evaluate').
     if strcmpi(app.SwitchCaimanEvaluate.Value, 'Caiman evaluate')
-        % find good above thresh (from caiman python)
+        % find good above thresh (from caiman python). All three metrics use
+        % >= so a cell exactly at any threshold is consistently accepted
+        % (SNR used to be strict >, which silently rejected boundary cells).
         idx_comp_r = find(app.est.r_values >= app.RvalthreshSpinner.Value);
-        idx_comp_raw = find(app.est.SNR_comp > app.SNRthreshSpinner.Value);
+        idx_comp_raw = find(app.est.SNR_comp >= app.SNRthreshSpinner.Value);
         idx_comp_cnn = find(app.est.cnn_preds >= app.CNNprobthreshSpinner.Value);
 
         % combine good
         idx_comp = union(idx_comp_cnn,idx_comp_r);
         idx_comp = union(idx_comp,idx_comp_raw);
 
-        % find bad below lowest thresh
-        bad_comp = find(or(or((app.est.r_values <= app.RvalLowestthreshSpinner.Value),(app.est.SNR_comp<= app.SNRLowestthreshSpinner.Value)),( app.est.cnn_preds <= app.CNNLowestthreshSpinner.Value)));
+        % find bad below lowest thresh — strict < so a cell exactly at the
+        % lowest threshold isn't simultaneously rejected (mirrors the >=
+        % accept side; "exactly at the lowest cutoff" is now ambiguous-good).
+        bad_comp = find(or(or((app.est.r_values < app.RvalLowestthreshSpinner.Value),(app.est.SNR_comp< app.SNRLowestthreshSpinner.Value)),( app.est.cnn_preds < app.CNNLowestthreshSpinner.Value)));
 
         idx_comp = setdiff(idx_comp,bad_comp);
 
@@ -42,4 +46,5 @@ function f_cs_evaluate_components(app)
         end
         app.proc.comp_accepted_core = logical(app.proc.comp_accepted_core);
     end
+    f_cs_autosave_ops(app);
 end

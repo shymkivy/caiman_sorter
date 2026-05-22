@@ -46,8 +46,14 @@ if isobject(app.ARmodelSwitchCfoopsi)
     deconv.c_foopsi.params.manual_tau_decay =   app.TaudecayEditFieldCfoopsi.Value;
     deconv.c_foopsi.params.convolve_gaus =      app.ConvolvewithgaussiankernelCheckBoxCfoopsi.Value;
     deconv.c_foopsi.params.gauss_kernel_simga =	app.GaussKernelSimgaCfoopsi.Value;
+    deconv.c_foopsi.params.fudge_factor =       app.FudgeFactorEditField.Value;
     deconv.c_foopsi.gui.scale_value =           app.ScaleEditFieldCfoopsi.Value;
     deconv.c_foopsi.gui.shift_value =           app.ShiftEditFieldCfoopsi.Value;
+    % Solver selection (cvx / dual / oasis). Persisted so the user's
+    % choice survives a save+reload. Falls back gracefully if widget absent.
+    if isprop(app, 'DeconvMethodDropDownCfoopsi') && isobject(app.DeconvMethodDropDownCfoopsi)
+        deconv.c_foopsi.params.method =         app.DeconvMethodDropDownCfoopsi.Value;
+    end
 end
 
 % mcmc
@@ -65,8 +71,46 @@ if isobject(app.ARmodelSwitchMCMC)
     deconv.MCMC.params.save_SAMP =              app.SaveSamplesOutputsMCMC.Value;
 end
     
+%% merge parameters (used by f_cs_find_similar_comp)
+merge.apply =              app.MergesimilarcompCheckBox.Value;
+merge.method =             app.MergemethodDropDown.Value;
+merge.spatial_thr =        app.spatialcorrthershEditField.Value;
+merge.temporal_thr =       app.tempcorrtheshEditField.Value;
+merge.use_accepted_only =  app.UseacceptedcellsCheckBox.Value;
+
+%% UI/UX state — view toggles and workflow flags. All optional in write_ops.
+ui.manual_edits_on =          app.ManualEditsSwitch.Value;
+ui.overwrite_deconv =         app.OverwriteCheckBox.Value;
+ui.press_arrow_to_change =    app.PressupdownkeytochangecellnumButton.Value;
+ui.smooth_raw_on =            app.SmoothRawButton.Value;
+ui.smooth_raw_window =        app.SmoothRawWindowSpinner.Value;
+ui.plot_last_c =              app.PlotLastCSwitch.Value;
+ui.plot_c =                   app.PlotCSwitch.Value;
+ui.plot_raw =                 app.PlotRawSwitch.Value;
+ui.plot_spikes =              app.PlotSpikesSwitch.Value;
+ui.plot_smooth_dfof =         app.PlotsmoothdfofSwitch.Value;
+if isobject(app.PlotconstfoopsiSwitch)
+    ui.plot_const_foopsi =    app.PlotconstfoopsiSwitch.Value;
+end
+if isobject(app.PlotMCMCSwitch)
+    ui.plot_mcmc =            app.PlotMCMCSwitch.Value;
+end
+% ButtonGroups — save the selected radio's label so it can be matched on restore.
+if isobject(app.PlotContoursButtonGroup) && ~isempty(app.PlotContoursButtonGroup.SelectedObject)
+    ui.contour_metric =       app.PlotContoursButtonGroup.SelectedObject.Text;
+end
+if isobject(app.BackgroundplotButtonGroup) && ~isempty(app.BackgroundplotButtonGroup.SelectedObject)
+    ui.bkg_plot_mode =        app.BackgroundplotButtonGroup.SelectedObject.Text;
+end
+% Auto-save toggle itself round-trips so the user's preference sticks.
+if isprop(app, 'AutoSaveOpsCheckBox') && isobject(app.AutoSaveOpsCheckBox)
+    ui.autosave_ops =         app.AutoSaveOpsCheckBox.Value;
+end
+
 %%
 ops.eval_params_caiman = eval_params_caiman;
 ops.eval_params2 = eval_params2;
 ops.deconv = deconv;
+ops.merge = merge;
+ops.ui = ui;
 end

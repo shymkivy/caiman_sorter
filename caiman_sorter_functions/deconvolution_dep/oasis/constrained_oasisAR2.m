@@ -62,6 +62,8 @@ end
 
 thresh = sn * sn * T;
 lam = 0;
+dphi = 0;   % set by nested update_phi(); MATLAB needs it declared in parent
+            % scope before the nested function references it.
 
 % change parameters due to downsampling
 if decimate>1
@@ -96,7 +98,7 @@ if ~optimize_b   %% don't optimize the baseline b
             lam = lam + dphi; 
       
             % update g
-            if and(optimize_g, ~g_converged);
+            if and(optimize_g, ~g_converged)
                 g0 = g;
                 [solution, active_set, g, spks] = update_g(y, active_set,lam);
                 if abs(g-g0)/g0 < 1e-3  % g is converged
@@ -126,7 +128,7 @@ else
             update_lam_b();
                         % update b and g    
             % update b and g
-            if and(optimize_g, ~g_converged);
+            if and(optimize_g, ~g_converged)
                 g0 = g;
                 [solution, active_set, g, spks] = update_g(y-b, active_set,lam);       
                 if abs(g-g0)/g0 < 1e-4;
@@ -225,7 +227,7 @@ g = fminbnd(@rss_g, 0, 1);
 yp = y - lam*(1-g);
 for m=1:len_active_set
     tmp_h = exp(log(g)*(0:maxl)');   % response kernel
-    tmp_hh = cumsum(h.*h);        % hh(k) = h(1:k)'*h(1:k)
+    tmp_hh = cumsum(tmp_h.*tmp_h);    % hh(k) = h(1:k)'*h(1:k)  (was `h.*h` — typo, `h` is nested-scope only)
     li = active_set(m, 4);
     ti = active_set(m, 3);
     idx = ti:(ti+li-1);

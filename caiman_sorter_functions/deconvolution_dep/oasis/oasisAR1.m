@@ -71,8 +71,11 @@ while ~isnan(ii_next)
     ii_prev = active_set(ii, 5);
 
     %% backtrack until violations fixed
+    % upstream 5019d96 (2019-01): wrap with max(0, ...) — prior pool's
+    % value can go slightly negative on the first frame, which caused
+    % infinite backtracking. Clamp to >=0 to break the loop.
     while (~isnan(ii_prev)) && (active_set(ii,1)/active_set(ii,2)<...
-            active_set(ii_prev,1)/active_set(ii_prev,2)*g^(active_set(ii_prev,4))+smin)
+            max(0, active_set(ii_prev,1)/active_set(ii_prev,2)*g^(active_set(ii_prev,4)))+smin)
         ii_next = ii;
         ii = ii_prev;
         active_set(ii,1) = active_set(ii,1) + active_set(ii_next,1)* (g^(active_set(ii,4)));

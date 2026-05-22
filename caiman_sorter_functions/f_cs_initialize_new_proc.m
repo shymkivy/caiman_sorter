@@ -10,7 +10,10 @@ proc.dims = est.dims;
 proc.idx_manual = [];
 proc.idx_manual_bad = [];
 proc.comp_accepted_core = false(proc.num_cells,1);
-proc.comp_accepted_core(proc.idx_components+1) = 1;
+% est.idx_components is already 1-based MATLAB indices after f_cs_load_h5_est
+% applied the python +1 offset. The previous `+1` here added a SECOND
+% offset, flagging the next cell instead of the actual accepted one.
+proc.comp_accepted_core(proc.idx_components) = 1;
 proc.comp_accepted = proc.comp_accepted_core;
 
 %%  average of top peaks
@@ -29,12 +32,8 @@ proc.peaks_to_ave = params.peaks_to_ave;
 proc.peak_bin_zero_size = params.peak_bin_zero_size;
 proc.peak_bin_sig_size = params.peak_bin_sig_size;
 
-%%  number of missing values (zeros) in traces
-proc.num_zeros = zeros(proc.num_cells,1);
-for n_cell = 1:proc.num_cells
-    temp_YrA = est.YrA(n_cell,:);
-    proc.num_zeros(n_cell) = sum(temp_YrA==0);
-end
+%%  number of missing values (zeros) in traces — vectorised
+proc.num_zeros = sum(est.YrA == 0, 2);
 
 %%  noise and time constants
 traces1 = est.YrA + est.C;

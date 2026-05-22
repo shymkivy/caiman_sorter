@@ -20,6 +20,6 @@ end
 
 options.fudge_factor = app.FudgeFactorEditField.Value;
 options.p = p;
-%options.method = 'dual';
+options.method = f_cs_get_foopsi_method(app);
 
 end

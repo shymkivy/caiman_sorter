@@ -46,11 +46,11 @@ if ~isempty(app.file_loc)
         if ~issparse(temp_load.est.A)
             temp_load.est.A = sparse(double(temp_load.est.A));
         end
-        
+
         if ~isfield(temp_load.est, 'num_cells_original')
             temp_load.est.num_cells_original = size(temp_load.est.C,1);
         end
-        
+
         app.est = temp_load.est;
         if isfield(temp_load, 'dims')
             app.est.dims = temp_load.dims;
@@ -63,15 +63,59 @@ if ~isempty(app.file_loc)
         if isfield(temp_load, 'proc')
             app.proc = temp_load.proc;
         end
+
+        % Defensive defaults — files written by other tools (e.g. Python
+        % sorter pre-1.01) may omit some legacy fields. Backfill so the
+        % downstream GUI code doesn't have to isfield-guard every access.
+        if ~isfield(app.est, 'num_cells_mod')
+            app.est.num_cells_mod = app.est.num_cells_original;
+        end
+        if ~isfield(app.est, 'error_log')
+            app.est.error_log = {};
+        end
+        if ~isfield(app.est, 'extraction_error_log')
+            app.est.extraction_error_log = {};
+        end
+        if ~isfield(app.est, 'contours') || isempty(app.est.contours)
+            app.est.contours = f_cs_compute_contours_from_A(app.est.A, app.est.dims);
+        end
+        if ~isfield(app.ops, 'browse_path')
+            app.ops.browse_path = '';
+        end
+        if ~isfield(app.ops, 'ops_path')
+            app.ops.ops_path = '';
+        end
+        % proc.dims may be missing or [0 0] (older Python output had a
+        % getattr fallback bug). Fall back to est.dims so reshape works.
+        % NB: `isfield(app, 'proc')` is unreliable here — app is the App
+        % Designer class, not a struct, so isfield always returns false.
+        need_dims = true;
+        if ~isempty(app.proc) && isstruct(app.proc) ...
+                && isfield(app.proc, 'dims') ...
+                && numel(app.proc.dims) >= 2 ...
+                && all(app.proc.dims(1:2) ~= 0)
+            need_dims = false;
+        end
+        if need_dims
+            if isempty(app.proc) || ~isstruct(app.proc)
+                app.proc = struct();
+            end
+            app.proc.dims = app.est.dims;
+        end
+
         f_cs_update_log(app, ['Loaded .mat: ' strrep(app.file_loc, '\', '\\')]);
     end
     
+    % Remember the full path so the next Browse pre-selects this file
+    % (in addition to the directory already cached in ops.browse_path).
+    app.ops.last_file = app.file_loc;
+
     app.VisualizationparamsPanel.Visible = 1;
     app.CatracePanel.Visible = 1;
     app.TabGroup.Visible = 1;
     app.TabGroup2.Visible = 1;
     app.CellselectionPanel.Visible = 1;
-    
+
     f_cs_write_ops(app);
     f_cs_update_log(app, 'Initializing...');
     f_cs_initialize_GUI_params(app);

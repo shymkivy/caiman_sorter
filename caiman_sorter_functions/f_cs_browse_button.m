@@ -1,18 +1,24 @@
 function ops = f_cs_browse_button(app)
 
 ops = app.ops;
-browse_exist = 0;
-if isfield(ops, 'browse_path')
-    browse_path = ops.browse_path;
-    if exist(browse_path, 'dir')
-        browse_exist = 1;
-    end
+
+% Seed uigetfile with: full path to the last loaded file if it still
+% exists (pre-selects it in the dialog) → else just the last directory →
+% else the working dir with the default filter set.
+% f_cs_load_button_pushed accepts .hdf5/.hdf/.h5 so all three are listed.
+filters = {'*.mat;*.hdf5;*.h5;*.hdf'; '*.mat'; '*.hdf5;*.h5;*.hdf'};
+
+seed = '';
+if isfield(ops, 'last_file') && ~isempty(ops.last_file) && exist(ops.last_file, 'file')
+    seed = ops.last_file;
+elseif isfield(ops, 'browse_path') && exist(ops.browse_path, 'dir')
+    seed = [ops.browse_path '*.mat;*.hdf5;*.h5;*.hdf'];
 end
 
-if browse_exist
-    [file_name,path] = uigetfile([browse_path '*.mat;*.hdf5']);
+if isempty(seed)
+    [file_name, path] = uigetfile(filters);
 else
-    [file_name,path] = uigetfile({'*.mat;*.hdf5'; '*.mat'; '*.hdf5'});
+    [file_name, path] = uigetfile(filters, 'Select file', seed);
 end
 
 if path

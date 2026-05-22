@@ -9,8 +9,8 @@ try
         save(app.ops_path, 'ops', '-append');
     end
     f_cs_update_log(app, ['Ops saved in: ' app.ops_path]);
-catch
-    f_cs_update_log(app, ['Unable to save ops in ' app.ops_path]);
+catch ME
+    f_cs_update_log(app, ['Unable to save ops in ' app.ops_path ': ' ME.message]);
 end
 
 end

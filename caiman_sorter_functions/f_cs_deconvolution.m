@@ -12,7 +12,7 @@ elseif strcmp(app.DeonvolutionTypeGroup.SelectedTab.Title, 'constrained foopsi')
         if isempty(app.proc.deconv.c_foopsi.S{n_cell}) || app.OverwriteCheckBox.Value
             f_cs_compute_constrained_foopsi(app, n_cell);
         end
-        hw.Value = n_cell/app.proc.num_cells;
+        hw.Value = n_cell_inx/num_cells;   % iteration progress, not absolute cell index
     end
     close(hw);
     app.PlotconstfoopsiSwitch.Enable = 1;
@@ -25,7 +25,7 @@ elseif strcmp(app.DeonvolutionTypeGroup.SelectedTab.Title, 'MCMC')
         if isempty(app.proc.deconv.MCMC.S{n_cell}) || app.OverwriteCheckBox.Value
             f_cs_compute_MCMC(app, n_cell);
         end
-        hw.Value = n_cell/app.proc.num_cells;
+        hw.Value = n_cell_inx/num_cells;
     end
     close(hw);
     app.PlotMCMCSwitch.Enable = 1;

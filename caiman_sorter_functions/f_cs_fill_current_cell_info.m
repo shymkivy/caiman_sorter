@@ -18,9 +18,14 @@ else
 end
 
 y_lim = find(sum(current_A,2)>0);
+x_lim = find(sum(current_A,1)>0);
+% Degenerate cell (all-zero footprint — can happen after a failed merge).
+% Skip the zoom adjustment rather than crashing on y_lim(1).
+if isempty(y_lim) || isempty(x_lim)
+    return;
+end
 y_coord = [y_lim(1), y_lim(end)];
 y_size = y_coord(2) - y_coord(1);
-x_lim = find(sum(current_A,1)>0);
 x_coord = [x_lim(1), x_lim(end)];
 x_size = x_coord(2) - x_coord(1);
 xy_diff = floor(abs(y_size - x_size)/2);

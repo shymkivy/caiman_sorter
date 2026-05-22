@@ -26,10 +26,15 @@ function f_cs_plot_cell_trace(app)
         hold(app.UIAxes_ca_trace, 'off');
     end
     if strcmp(app.PlotSpikesSwitch.Value, 'On')
-        scale_up = max(app.est.C(app.current_cell_num,:))/max(app.est.S(app.current_cell_num,:))/2;
-        hold(app.UIAxes_ca_trace, 'on');
-        plot(app.UIAxes_ca_trace, plot_time, app.est.S(app.current_cell_num,:)*scale_up, 'color', 	[0.9290, 0.6940, 0.1250]);
-        hold(app.UIAxes_ca_trace, 'off');
+        max_S = max(app.est.S(app.current_cell_num,:));
+        % Guard against an all-zero spike trace — max_S=0 would give a
+        % NaN-scaled plot, drawing nothing and flooding the figure with NaNs.
+        if max_S > 0
+            scale_up = max(app.est.C(app.current_cell_num,:)) / max_S / 2;
+            hold(app.UIAxes_ca_trace, 'on');
+            plot(app.UIAxes_ca_trace, plot_time, app.est.S(app.current_cell_num,:)*scale_up, 'color', [0.9290, 0.6940, 0.1250]);
+            hold(app.UIAxes_ca_trace, 'off');
+        end
     end
     
     if strcmp(app.PlotsmoothdfofSwitch.Value, 'On')
