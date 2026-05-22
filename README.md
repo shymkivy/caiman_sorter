@@ -8,11 +8,6 @@ MATLAB GUI to manually curate cells extracted by [CaImAn](https://github.com/fla
 
 - MATLAB **R2019a or later** (uifigure tooltips, programmatic callback wiring). Compatible up to R2023.
 - **Signal Processing Toolbox** (for `pwelch`-based noise estimation).
-- *Optional*: **Optimization Toolbox** (`fmincon`) — enables the `dual` foopsi solver.
-- *Optional*: **[CVX](http://cvxr.com/cvx/download/)** — enables the `cvx` foopsi solver (highest quality, slowest).
-- *Optional*: legacy MCMC deconvolution also relies on CVX.
-
-OASIS is **vendored** in `caiman_sorter_functions/deconvolution_dep/oasis/` and works with no external deps, so you can run the GUI without installing anything beyond MATLAB + Signal Processing Toolbox.
 
 ## Usage
 
@@ -30,35 +25,15 @@ The "constrained foopsi" tab exposes a solver dropdown:
 
 | Method | Dependencies | Notes |
 |---|---|---|
-| **`oasis`** | none (vendored) | Fast, no install needed. Default on systems without CVX / Optimization Toolbox. |
+| **`oasis`** | none (vendored) | Fast. |
 | **`cvx`** | [CVX](http://cvxr.com/cvx/download/) | Highest quality, slowest. |
 | **`dual`** | Optimization Toolbox | Built-in fallback (uses `fmincon`). |
 
-Items the dropdown labels `(not installed)` are still selectable — the backend warns and falls back to whichever solver is available. The **Fudge factor** field (default 0.99) shrinks the AR poles to compensate for time-constant estimation bias, and now propagates into all three solvers (including OASIS).
+The **Fudge factor** field (default 0.99) shrinks the AR poles to compensate for time-constant estimation bias, and propagates into all three solvers.
 
-## Settings persistence
+Legacy MCMC deconvolution also relies on [CVX](http://cvxr.com/cvx/download/).
 
-GUI parameters (thresholds, deconv settings, merge params, view toggles, last loaded file path) auto-save to `<prefdir>/caiman_sorter_options.mat` between sessions. The exact path is logged on startup. Toggle the **Auto-save options** checkbox to disable. Saving also triggers on:
-
-- App close.
-- Save Data.
-- Evaluate.
-- Toggling the auto-save checkbox itself (so an off state is persisted).
-
-## Cross-compatibility with the Python sorter
-
-Sort files saved by [`shymkivy/caiman_sorter_py`](https://github.com/shymkivy/caiman_sorter_py) load directly in this GUI, and vice versa. Both implementations follow the same on-disk schema for `est` / `proc` / `ops`, including:
-
-- 1-based MATLAB indices for `idx_components` / `idx_components_bad`
-- Sparse `est.A` in MATLAB's `data/ir/jc` format
-- `logical` (uint8) booleans for accept masks and eval flags
-- The `est.R` ↔ `est.YrA` alias
-- Per-cell contour cell-arrays
-- The `'CaImAn evaluate'` / `'Reject threshhold'` switch strings (case-insensitive on load)
-
-Old sort `.mat` files missing newer fields (e.g. no `merge_parents`, no per-cell `fudge_factor`) still load — defaults fill in.
-
-## Dependencies (third-party, vendored)
+### Vendored deconvolution code
 
 - `deconvolution_dep/oasis/` — Pengcheng Zhou's [OASIS_matlab](https://github.com/zhoupc/OASIS_matlab) port. Synced with upstream bug-fix commits.
 - `deconvolution_dep/MCMC/` — Eftychios Pnevmatikakis' MCMC deconvolution code.
